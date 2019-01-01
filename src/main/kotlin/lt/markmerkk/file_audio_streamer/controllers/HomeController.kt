@@ -45,7 +45,7 @@ class HomeController {
     }
 
     @RequestMapping(
-            value = ["/${Consts.ENDPOINT_TRACKS}/{bookIndex}/{trackIndex}"],
+            value = ["/${Consts.ENDPOINT_BOOKS}/{bookIndex}/${Consts.ENDPOINT_TRACKS}/{trackIndex}"],
             method = [RequestMethod.GET],
             produces = ["application/json"]
     )
@@ -58,7 +58,7 @@ class HomeController {
         val book = bookRepository.bookAtIndex(bookIndex) ?: throw BookNotFoundException()
         val tracksForBook = bookRepository.tracksForBook(book)
         val track = tracksForBook.getOrNull(trackIndex) ?: throw TrackNotFoundException()
-        response.sendRedirect("/tracks/${book.title}/${track.rawTitle}")
+        response.sendRedirect("/${Consts.ENDPOINT_TRACKS}/${book.title}/${track.rawTitle}")
     }
 
     //region Classes

@@ -2,13 +2,18 @@ package lt.markmerkk.file_audio_streamer.controllers
 
 import lt.markmerkk.file_audio_streamer.Consts
 import lt.markmerkk.file_audio_streamer.fs.BookRepository
+import lt.markmerkk.file_audio_streamer.fs.FSInteractor
 import lt.markmerkk.file_audio_streamer.models.Book
 import lt.markmerkk.file_audio_streamer.models.Track
 import lt.markmerkk.file_audio_streamer.responses.BookResponse
 import lt.markmerkk.file_audio_streamer.responses.TrackResponse
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.core.io.Resource
+import org.springframework.core.io.ResourceLoader
+import org.springframework.core.io.support.ResourcePatternUtils
 import org.springframework.data.crossstore.ChangeSetPersister
 import org.springframework.http.HttpStatus
+import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.*
 import java.lang.IllegalArgumentException
 import javax.servlet.http.HttpServletResponse
@@ -18,6 +23,7 @@ import javax.servlet.http.HttpServletResponse
 class HomeController {
 
     @Autowired lateinit var bookRepository: BookRepository
+    @Autowired lateinit var fsInteractor: FSInteractor
 
     @RequestMapping(
             value = ["/${Consts.ENDPOINT_BOOKS}"],
@@ -47,18 +53,17 @@ class HomeController {
     @RequestMapping(
             value = ["/${Consts.ENDPOINT_BOOKS}/{bookIndex}/${Consts.ENDPOINT_TRACKS}/{trackIndex}"],
             method = [RequestMethod.GET],
-            produces = ["application/json"]
+            produces = [MediaType.APPLICATION_OCTET_STREAM_VALUE]
     )
     @ResponseBody
     fun mapTrack(
-            response: HttpServletResponse,
             @PathVariable bookIndex: Int,
             @PathVariable trackIndex: Int
-    ) {
+    ): Resource {
         val book = bookRepository.bookAtIndex(bookIndex) ?: throw BookNotFoundException()
         val tracksForBook = bookRepository.tracksForBook(book)
         val track = tracksForBook.getOrNull(trackIndex) ?: throw TrackNotFoundException()
-        response.sendRedirect("/${Consts.ENDPOINT_TRACKS}/${book.title}/${track.rawTitle}")
+        return fsInteractor.fileAsResource(track.path)
     }
 
     //region Classes

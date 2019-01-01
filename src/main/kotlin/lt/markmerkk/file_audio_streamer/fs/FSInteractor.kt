@@ -1,12 +1,10 @@
 package lt.markmerkk.file_audio_streamer.fs
 
+import org.springframework.core.io.Resource
 import org.springframework.core.io.ResourceLoader
 import org.springframework.core.io.support.ResourcePatternUtils
 import java.io.File
 
-/**
- * File system interactor
- */
 class FSInteractor(
         private val resourceLoader: ResourceLoader
 ) {
@@ -21,4 +19,8 @@ class FSInteractor(
         }
         return listOf(rootFile)
     }
+
+    fun fileAsResource(absoluteFilePath: String): Resource = ResourcePatternUtils
+            .getResourcePatternResolver(resourceLoader)
+            .getResource("file:$absoluteFilePath")
 }

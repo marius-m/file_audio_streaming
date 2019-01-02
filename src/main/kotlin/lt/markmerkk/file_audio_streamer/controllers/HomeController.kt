@@ -47,7 +47,7 @@ class HomeController {
     ): List<TrackResponse> {
         val book = bookRepository.bookAtIndex(bookIndex) ?: throw BookNotFoundException()
         return bookRepository.tracksForBook(book)
-                .map { TrackResponse.from(it) }
+                .map { TrackResponse.from(book, it) }
     }
 
     @RequestMapping(

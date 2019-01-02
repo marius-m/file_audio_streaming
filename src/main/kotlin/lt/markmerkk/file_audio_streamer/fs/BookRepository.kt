@@ -23,7 +23,7 @@ class BookRepository(
         return fsInteractor.filesInPath(tracksPathForBook)
                 .filter { it.isFile }
                 .filter { it.exists() }
-                .mapIndexed { index, file ->  Track.from(index, file) }
+                .mapIndexed { index, file ->  Track.from(book.index, index, file) }
     }
 
     companion object {

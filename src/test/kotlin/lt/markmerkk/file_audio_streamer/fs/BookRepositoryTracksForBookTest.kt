@@ -54,6 +54,7 @@ class BookRepositoryTracksForBookTest {
         // Assert
         assertThat(resultTracks).containsExactly(
                 Track(
+                        bookIndex = 0,
                         index = 0,
                         rawTitle = "track1.mp3",
                         path = "valid_path"
@@ -79,16 +80,19 @@ class BookRepositoryTracksForBookTest {
         // Assert
         assertThat(resultTracks).containsExactly(
                 Track(
+                        bookIndex = 0,
                         index = 0,
                         rawTitle = "track1.mp3",
                         path = "valid_path"
                 ),
                 Track(
+                        bookIndex = 0,
                         index = 1,
                         rawTitle = "track2.mp3",
                         path = "valid_path"
                 ),
                 Track(
+                        bookIndex = 0,
                         index = 2,
                         rawTitle = "track3.mp3",
                         path = "valid_path"

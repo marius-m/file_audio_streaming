@@ -1,26 +1,50 @@
 package lt.markmerkk.file_audio_streamer.models
 
+import lt.markmerkk.file_audio_streamer.Consts
 import java.io.File
 
 data class Track(
         val bookIndex: Int,
-        val rawTitle: String,
+        val rawFileName: String,
         val index: Int,
         val path: String
 ) {
-    val title = rawTitle
-            .replace(".mp3", "")
-            .replace(".wav", "")
+    val title = extractTitle()
 
     companion object {
         fun from(bookFileIndex: Int, fileIndex: Int, file: File): Track {
             return Track(
                     bookIndex = bookFileIndex,
-                    rawTitle = file.name,
+                    rawFileName = file.name,
                     index = fileIndex,
                     path = file.absolutePath
             )
         }
     }
 
+    /**
+     * Extracts a title
+     */
+    internal fun extractTitle(): String {
+        return Consts.supportedExtensions
+                .fold(initial = rawFileName, operation = { title, extension ->
+                    title.replace(
+                            oldValue = ".$extension",
+                            newValue = "",
+                            ignoreCase = true
+                    )
+                })
+    }
+
+    /**
+     * Check if track is of supported type
+     */
+    internal fun isSupported(): Boolean {
+        return Consts.supportedExtensions
+                .firstOrNull { supportedExtension ->
+                    rawFileName.contains(".$supportedExtension", ignoreCase = true)
+                } != null
+    }
+
 }
+

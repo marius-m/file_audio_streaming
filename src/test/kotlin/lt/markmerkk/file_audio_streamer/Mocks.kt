@@ -3,9 +3,24 @@ package lt.markmerkk.file_audio_streamer
 import com.nhaarman.mockito_kotlin.doReturn
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.whenever
+import lt.markmerkk.file_audio_streamer.models.Track
 import java.io.File
 
 object Mocks {
+
+    fun createTrack(
+            bookIndex: Int = 0,
+            index: Int = 0,
+            rawTitle: String = "valid_title_$index.mp3",
+            path: String = "valid_path"
+    ): Track = Track(
+            bookIndex = bookIndex,
+            rawFileName = rawTitle,
+            index = index,
+            path = path
+    )
+
+    //region Mocks
 
     fun mockFile(
             exists: Boolean = true,
@@ -42,4 +57,7 @@ object Mocks {
             isFile = false,
             name = name
     )
+
+    //endregion
+
 }

@@ -56,10 +56,25 @@ class BookRepositoryTracksForBookTest {
                 Track(
                         bookIndex = 0,
                         index = 0,
-                        rawTitle = "track1.mp3",
+                        rawFileName = "track1.mp3",
                         path = "valid_path"
                 )
         )
+    }
+
+    @Test
+    fun unsupportedTrack() {
+        // Assemble
+        val book1 = Book(index = 0, title = "book1")
+        val bookPath = BookRepository.tracksPathForBook(book1)
+        val tracks = listOf(Mocks.mockFileAsFile(name = "track1.png")) // unsupported file type
+        doReturn(tracks).whenever(fsInteractor).filesInPath(bookPath)
+
+        // Act
+        val resultTracks = bookRepository.tracksForBook(book1)
+
+        // Assert
+        assertThat(resultTracks).isEmpty()
     }
 
     @Test
@@ -82,19 +97,19 @@ class BookRepositoryTracksForBookTest {
                 Track(
                         bookIndex = 0,
                         index = 0,
-                        rawTitle = "track1.mp3",
+                        rawFileName = "track1.mp3",
                         path = "valid_path"
                 ),
                 Track(
                         bookIndex = 0,
                         index = 1,
-                        rawTitle = "track2.mp3",
+                        rawFileName = "track2.mp3",
                         path = "valid_path"
                 ),
                 Track(
                         bookIndex = 0,
                         index = 2,
-                        rawTitle = "track3.mp3",
+                        rawFileName = "track3.mp3",
                         path = "valid_path"
                 )
         )

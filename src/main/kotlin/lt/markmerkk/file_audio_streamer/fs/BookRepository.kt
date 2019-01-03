@@ -24,6 +24,7 @@ class BookRepository(
                 .filter { it.isFile }
                 .filter { it.exists() }
                 .mapIndexed { index, file ->  Track.from(book.index, index, file) }
+                .filter { it.isSupported() }
     }
 
     companion object {

@@ -14,15 +14,16 @@ import java.io.File
 
 class BookRepositoryBookAtIndexTest {
 
-    @Mock
-    lateinit var fsInteractor: FSInteractor
+    @Mock lateinit var fsInteractor: FSInteractor
+    @Mock lateinit var fsSource: FSSource
     lateinit var bookRepository: BookRepository
 
     @Before
     fun setUp() {
         MockitoAnnotations.initMocks(this)
         bookRepository = BookRepository(
-                fsInteractor = fsInteractor
+                fsInteractor = fsInteractor,
+                fsSource = fsSource
         )
     }
 

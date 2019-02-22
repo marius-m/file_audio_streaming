@@ -2,6 +2,8 @@ package lt.markmerkk.file_audio_streamer.configs
 
 import lt.markmerkk.file_audio_streamer.fs.BookRepository
 import lt.markmerkk.file_audio_streamer.fs.FSInteractor
+import lt.markmerkk.file_audio_streamer.fs.FSSource
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.core.io.ResourceLoader
@@ -9,6 +11,13 @@ import org.springframework.core.io.ResourceLoader
 
 @Configuration
 class FsConfig {
+
+    @Bean
+    open fun provideFsConfig(
+            @Value("\${rootPath}") rootConfig: String
+    ): FSSource {
+        return FSSource(rootConfig)
+    }
 
     @Bean
     open fun fsInteractor(
@@ -19,9 +28,10 @@ class FsConfig {
 
     @Bean
     open fun bookRepository(
-            fsInteractor: FSInteractor
+            fsInteractor: FSInteractor,
+            fsSource: FSSource
     ): BookRepository {
-        return BookRepository(fsInteractor)
+        return BookRepository(fsInteractor, fsSource)
     }
 
 }

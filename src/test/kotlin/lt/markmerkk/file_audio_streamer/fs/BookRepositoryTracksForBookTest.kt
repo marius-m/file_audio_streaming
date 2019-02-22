@@ -14,23 +14,27 @@ import java.io.File
 
 class BookRepositoryTracksForBookTest {
 
-    @Mock
-    lateinit var fsInteractor: FSInteractor
+    @Mock lateinit var fsInteractor: FSInteractor
+    @Mock lateinit var fsSource: FSSource
     lateinit var bookRepository: BookRepository
+
+    private val rootPath = "books"
 
     @Before
     fun setUp() {
         MockitoAnnotations.initMocks(this)
         bookRepository = BookRepository(
-                fsInteractor = fsInteractor
+                fsInteractor = fsInteractor,
+                fsSource = fsSource
         )
+        doReturn("books").whenever(fsSource).rootPath
     }
 
     @Test
     fun noTracks() {
         // Assemble
         val book1 = Book(index = 0, title = "book1")
-        val bookPath = BookRepository.tracksPathForBook(book1)
+        val bookPath = BookRepository.tracksPathForBook(rootPath, book1)
         doReturn(emptyList<File>()).whenever(fsInteractor).filesInPath(bookPath)
 
         // Act
@@ -44,7 +48,7 @@ class BookRepositoryTracksForBookTest {
     fun validTrack() {
         // Assemble
         val book1 = Book(index = 0, title = "book1")
-        val bookPath = BookRepository.tracksPathForBook(book1)
+        val bookPath = BookRepository.tracksPathForBook(rootPath, book1)
         val tracks = listOf(Mocks.mockFileAsFile(name = "track1.mp3"))
         doReturn(tracks).whenever(fsInteractor).filesInPath(bookPath)
 
@@ -66,7 +70,7 @@ class BookRepositoryTracksForBookTest {
     fun unsupportedTrack() {
         // Assemble
         val book1 = Book(index = 0, title = "book1")
-        val bookPath = BookRepository.tracksPathForBook(book1)
+        val bookPath = BookRepository.tracksPathForBook(rootPath, book1)
         val tracks = listOf(Mocks.mockFileAsFile(name = "track1.png")) // unsupported file type
         doReturn(tracks).whenever(fsInteractor).filesInPath(bookPath)
 
@@ -81,7 +85,7 @@ class BookRepositoryTracksForBookTest {
     fun validTracks() {
         // Assemble
         val book1 = Book(index = 0, title = "book1")
-        val bookPath = BookRepository.tracksPathForBook(book1)
+        val bookPath = BookRepository.tracksPathForBook(rootPath, book1)
         val tracks = listOf(
                 Mocks.mockFileAsFile(name = "track1.mp3"),
                 Mocks.mockFileAsFile(name = "track2.mp3"),
@@ -119,7 +123,7 @@ class BookRepositoryTracksForBookTest {
     fun directoryInTrackPath() {
         // Assemble
         val book1 = Book(index = 0, title = "book1")
-        val bookPath = BookRepository.tracksPathForBook(book1)
+        val bookPath = BookRepository.tracksPathForBook(rootPath, book1)
         val tracks = listOf(
                 Mocks.mockFileAsDirectory(name = "subdirectory")
         )
@@ -136,7 +140,7 @@ class BookRepositoryTracksForBookTest {
     fun fileDoesNotExist() {
         // Assemble
         val book1 = Book(index = 0, title = "book1")
-        val bookPath = BookRepository.tracksPathForBook(book1)
+        val bookPath = BookRepository.tracksPathForBook(rootPath, book1)
         val tracks = listOf(Mocks.mockFileAsFile(exists = false, name = "track1.mp3"))
         doReturn(tracks).whenever(fsInteractor).filesInPath(bookPath)
 

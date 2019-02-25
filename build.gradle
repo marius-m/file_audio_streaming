@@ -47,6 +47,7 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter:$springBootVersion")
 	implementation("org.springframework.boot:spring-boot-starter-data-rest:$springBootVersion")
 	implementation("org.springframework.boot:spring-boot-starter-web:$springBootVersion")
+	implementation("org.springframework.boot:spring-boot-starter-security:$springBootVersion")
 
 	testImplementation("org.jetbrains.kotlin:kotlin-test:1.1.50")
 	testImplementation("org.jetbrains.kotlin:kotlin-test-junit:1.1.50")

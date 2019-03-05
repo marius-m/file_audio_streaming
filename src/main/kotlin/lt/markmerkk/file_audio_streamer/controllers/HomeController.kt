@@ -7,15 +7,21 @@ import lt.markmerkk.file_audio_streamer.models.Book
 import lt.markmerkk.file_audio_streamer.models.Track
 import lt.markmerkk.file_audio_streamer.responses.BookResponse
 import lt.markmerkk.file_audio_streamer.responses.TrackResponse
+import lt.markmerkk.utils.MultipartFileSender
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.io.Resource
 import org.springframework.core.io.ResourceLoader
 import org.springframework.core.io.support.ResourcePatternUtils
 import org.springframework.data.crossstore.ChangeSetPersister
+import org.springframework.data.rest.webmvc.ResourceNotFoundException
+import org.springframework.http.CacheControl
+import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.*
+import java.io.File
 import java.lang.IllegalArgumentException
+import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
 @RestController
@@ -58,12 +64,20 @@ class HomeController {
     @ResponseBody
     fun mapTrack(
             @PathVariable bookIndex: Int,
-            @PathVariable trackIndex: Int
-    ): Resource {
+            @PathVariable trackIndex: Int,
+            response: HttpServletResponse,
+            request: HttpServletRequest
+    ) {
         val book = bookRepository.bookAtIndex(bookIndex) ?: throw BookNotFoundException()
         val tracksForBook = bookRepository.tracksForBook(book)
         val track = tracksForBook.getOrNull(trackIndex) ?: throw TrackNotFoundException()
-        return fsInteractor.fileAsResource(track.path)
+
+        val headers = HttpHeaders()
+        headers.cacheControl = CacheControl.noCache().headerValue
+        return MultipartFileSender.fromFile(File(track.path))
+                .with(response)
+                .with(request)
+                .serveResource()
     }
 
     //region Classes

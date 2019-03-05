@@ -1,7 +1,10 @@
 package lt.markmerkk.file_audio_streamer.configs
 
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.context.annotation.PropertySource
+import org.springframework.core.env.Environment
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
@@ -13,19 +16,27 @@ import org.springframework.security.crypto.password.PasswordEncoder
 @EnableWebSecurity
 class SecurityConfig : WebSecurityConfigurerAdapter() {
 
+    @Autowired
+    lateinit var credentials: Credentials
+
     override fun configure(auth: AuthenticationManagerBuilder) {
-        auth.inMemoryAuthentication()
-                .withUser("user")
-                .password(passwordEncoder().encode("password"))
-                .roles("USER")
+        println("Using credentials: $credentials")
+        if (!credentials.isEmpty()) {
+            auth.inMemoryAuthentication()
+                    .withUser(credentials.username)
+                    .password(passwordEncoder().encode(credentials.password))
+                    .roles("USER")
+        }
     }
 
     override fun configure(http: HttpSecurity) {
-        http.authorizeRequests()
-                .anyRequest()
-                .authenticated()
-                .and()
-                .httpBasic()
+        if (!credentials.isEmpty()) {
+            http.authorizeRequests()
+                    .anyRequest()
+                    .authenticated()
+                    .and()
+                    .httpBasic()
+        }
     }
 
     @Bean

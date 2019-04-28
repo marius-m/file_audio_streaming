@@ -32,7 +32,7 @@ class HomeController {
     @Autowired lateinit var fsInteractor: FSInteractor
 
     @RequestMapping(
-            value = ["/${Consts.ENDPOINT_BOOKS}"],
+            value = ["/books"],
             method = [RequestMethod.GET],
             produces = ["application/json"]
     )
@@ -43,7 +43,7 @@ class HomeController {
     }
 
     @RequestMapping(
-            value = ["/${Consts.ENDPOINT_BOOKS}/{bookIndex}"],
+            value = ["/books/{bookIndex}"],
             method = [RequestMethod.GET],
             produces = ["application/json"]
     )
@@ -57,7 +57,7 @@ class HomeController {
     }
 
     @RequestMapping(
-            value = ["/${Consts.ENDPOINT_BOOKS}/{bookIndex}/${Consts.ENDPOINT_TRACKS}/{trackIndex}"],
+            value = ["/books/{bookIndex}/categories/{trackIndex}"],
             method = [RequestMethod.GET],
             produces = [MediaType.APPLICATION_OCTET_STREAM_VALUE]
     )

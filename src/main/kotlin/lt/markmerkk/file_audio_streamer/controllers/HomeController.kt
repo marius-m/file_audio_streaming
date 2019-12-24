@@ -6,6 +6,7 @@ import lt.markmerkk.file_audio_streamer.fs.FSInteractor
 import lt.markmerkk.file_audio_streamer.models.Book
 import lt.markmerkk.file_audio_streamer.models.Track
 import lt.markmerkk.file_audio_streamer.responses.BookResponse
+import lt.markmerkk.file_audio_streamer.responses.CategoryResponse
 import lt.markmerkk.file_audio_streamer.responses.TrackResponse
 import lt.markmerkk.utils.MultipartFileSender
 import org.springframework.beans.factory.annotation.Autowired
@@ -30,6 +31,17 @@ class HomeController {
 
     @Autowired lateinit var bookRepository: BookRepository
     @Autowired lateinit var fsInteractor: FSInteractor
+
+    @RequestMapping(
+            value = ["/categories"],
+            method = [RequestMethod.GET],
+            produces = ["application/json"]
+    )
+    @ResponseBody
+    fun categories(): List<CategoryResponse> {
+        return bookRepository.categories()
+                .map { CategoryResponse.from(it) }
+    }
 
     @RequestMapping(
             value = ["/books"],

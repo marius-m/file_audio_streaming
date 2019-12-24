@@ -1,12 +1,17 @@
 package lt.markmerkk.file_audio_streamer.fs
 
 import lt.markmerkk.file_audio_streamer.models.Book
+import lt.markmerkk.file_audio_streamer.models.Category
 import lt.markmerkk.file_audio_streamer.models.Track
 
 class BookRepository(
         private val fsInteractor: FSInteractor,
         private val fsSource: FSSource
 ) {
+
+    private var categories: List<Category> = initCategories(fsSource.categoriesAsArgs)
+
+    fun categories(): List<Category> = categories
 
     fun bookAtIndex(index: Int): Book? = books().getOrNull(index)
 
@@ -30,6 +35,23 @@ class BookRepository(
 
     companion object {
         fun tracksPathForBook(rootPath: String, book: Book): String = "$rootPath/${book.title}"
+        fun initCategories(
+                categoriesAsArgs: String
+        ): List<Category> {
+            if (categoriesAsArgs.isEmpty()) {
+                return emptyList()
+            }
+            return categoriesAsArgs
+                    .split(",")
+                    .mapIndexed { index, path ->
+                        val catName = extractCategoryName(path)
+                        Category(index = index, title = catName, path = path)
+                    }
+        }
+
+        fun extractCategoryName(path: String): String {
+            return path.split("/").last()
+        }
     }
 
 }

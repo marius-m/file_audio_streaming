@@ -1,5 +1,8 @@
 package lt.markmerkk.file_audio_streamer.fs
 
+@Deprecated("Use categories instead")
 class FSSource(
-        val rootPath: String
+        @Deprecated("Use categories instead")
+        val rootPath: String,
+        val categoriesAsArgs: String
 )

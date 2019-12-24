@@ -3,6 +3,7 @@ package lt.markmerkk.file_audio_streamer.configs
 import lt.markmerkk.file_audio_streamer.fs.BookRepository
 import lt.markmerkk.file_audio_streamer.fs.FSInteractor
 import lt.markmerkk.file_audio_streamer.fs.FSSource
+import lt.markmerkk.file_audio_streamer.models.Category
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -27,9 +28,9 @@ class FsConfig {
 
     @Bean
     open fun provideFsConfig(
-            @Value("\${rootPath}") rootConfig: String
+            @Value("\${categoriesAsArgs}") categoriesAsArgs: String
     ): FSSource {
-        return FSSource(rootConfig)
+        return FSSource("", categoriesAsArgs)
     }
 
     @Bean

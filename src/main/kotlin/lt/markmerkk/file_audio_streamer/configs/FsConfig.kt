@@ -38,7 +38,7 @@ class FsConfig {
     open fun provideFsConfig(
             @Value("\${rootPaths}") rootPaths: String
     ): FSSource {
-        return FSSource("", rootPaths)
+        return FSSource(rootPaths)
     }
 
     @Bean
@@ -55,6 +55,7 @@ class FsConfig {
             uuidGen: UUIDGen
     ): BookRepository {
         return BookRepository(fsInteractor, fsSource, uuidGen)
+                .apply { renewCache() }
     }
 
 }

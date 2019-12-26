@@ -40,10 +40,22 @@ class HomeController {
             produces = ["application/json"]
     )
     @ResponseBody
-    fun books(
+    fun booksForCategory(
             @PathVariable categoryId: String
     ): List<BookResponse> {
         return bookRepository.categoryBooks(categoryId)
+                .map { BookResponse.from(it) }
+    }
+
+    @RequestMapping(
+            value = ["/books"],
+            method = [RequestMethod.GET],
+            produces = ["application/json"]
+    )
+    @ResponseBody
+    fun allBooks(
+    ): List<BookResponse> {
+        return bookRepository.books()
                 .map { BookResponse.from(it) }
     }
 
@@ -66,7 +78,7 @@ class HomeController {
             produces = [MediaType.APPLICATION_OCTET_STREAM_VALUE]
     )
     @ResponseBody
-    fun mapTrack(
+    fun track(
             @PathVariable trackId: String,
             response: HttpServletResponse,
             request: HttpServletRequest

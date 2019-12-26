@@ -1,7 +1,10 @@
 package lt.markmerkk.file_audio_streamer.fs
 
 import lt.markmerkk.file_audio_streamer.UUIDGen
-import lt.markmerkk.file_audio_streamer.models.*
+import lt.markmerkk.file_audio_streamer.models.Book
+import lt.markmerkk.file_audio_streamer.models.Book2
+import lt.markmerkk.file_audio_streamer.models.Category
+import lt.markmerkk.file_audio_streamer.models.Track2
 
 class BookRepository(
         private val fsInteractor: FSInteractor,
@@ -32,25 +35,31 @@ class BookRepository(
 
     fun categories(): List<Category> = categories.values.toList()
 
-    fun bookAtIndex(index: Int): Book? = books().getOrNull(index)
-
-    fun books(): List<Book> {
-        return fsInteractor.filesInPath("${fsSource.rootPath}/")
-                .filter { it.isDirectory }
-                .filter { it.exists() }
-                .mapIndexed { index, file ->  Book.from(index, file) }
+    @Throws(IllegalArgumentException::class)
+    fun categoryBooks(categoryId: String): List<Book2> {
+        val category = categories[categoryId] ?: throw IllegalArgumentException("No such category")
+        return books.values
+                .filter { it.categoryId == category.id }
     }
 
-    @Deprecated("Not used any more")
-    fun trackAtIndex(book: Book, index: Int): Track? = tracksForBook(book).getOrNull(index)
+    fun books(): List<Book2> {
+        return this
+                .books
+                .values
+                .toList()
+    }
 
-    fun tracksForBook(book: Book): List<Track> {
-        val tracksPathForBook = tracksPathForBook(fsSource.rootPath, book)
-        return fsInteractor.filesInPath(tracksPathForBook)
-                .filter { it.isFile }
-                .filter { it.exists() }
-                .mapIndexed { index, file ->  Track.from(book.index, index, file) }
-                .filter { it.isSupported() }
+    @Throws(IllegalArgumentException::class)
+    fun tracksForBook(bookId: String): List<Track2> {
+        val book = books[bookId] ?: throw IllegalArgumentException("No such book")
+        return tracks
+                .values
+                .filter { it.bookId == book.id }
+    }
+
+    @Throws(IllegalArgumentException::class)
+    fun track(trackId: String): Track2 {
+        return tracks[trackId] ?: throw IllegalArgumentException("No such track")
     }
 
     //region Convenience

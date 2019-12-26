@@ -9,6 +9,8 @@ data class Track2(
         val path: String
 ) {
 
+    val title = extractTitle()
+
     /**
      * Check if track is of supported type
      */
@@ -19,5 +21,16 @@ data class Track2(
                 } != null
         val hasMetadataPrefix = rawFileName.startsWith("._")
         return hasExtension && !hasMetadataPrefix
+    }
+
+    internal fun extractTitle(): String {
+        return Consts.supportedExtensions
+                .fold(initial = rawFileName, operation = { title, extension ->
+                    title.replace(
+                            oldValue = ".$extension",
+                            newValue = "",
+                            ignoreCase = true
+                    )
+                })
     }
 }

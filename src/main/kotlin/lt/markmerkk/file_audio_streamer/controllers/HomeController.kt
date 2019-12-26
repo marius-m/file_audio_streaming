@@ -35,47 +35,43 @@ class HomeController {
     }
 
     @RequestMapping(
-            value = ["/categories/{categoryIndex}/books"],
+            value = ["/categories/{categoryId}/books"],
             method = [RequestMethod.GET],
             produces = ["application/json"]
     )
     @ResponseBody
     fun books(
-            @PathVariable categoryIndex: Int
+            @PathVariable categoryId: String
     ): List<BookResponse> {
-        TODO()
+        return bookRepository.categoryBooks(categoryId)
+                .map { BookResponse.from(it) }
     }
 
     @RequestMapping(
-            value = ["/books/{bookIndex}"],
+            value = ["/books/{bookId}"],
             method = [RequestMethod.GET],
             produces = ["application/json"]
     )
     @ResponseBody
     fun bookTracks(
-            @PathVariable bookIndex: Int
+            @PathVariable bookId: String
     ): List<TrackResponse> {
-        val book = bookRepository.bookAtIndex(bookIndex) ?: throw BookNotFoundException()
-        return bookRepository.tracksForBook(book)
-                .map { TrackResponse.from(book, it) }
+        return bookRepository.tracksForBook(bookId)
+                .map { TrackResponse.from(it) }
     }
 
     @RequestMapping(
-            value = ["/books/{bookIndex}/categories/{trackIndex}"],
+            value = ["/tracks/{trackId}"],
             method = [RequestMethod.GET],
             produces = [MediaType.APPLICATION_OCTET_STREAM_VALUE]
     )
     @ResponseBody
     fun mapTrack(
-            @PathVariable bookIndex: Int,
-            @PathVariable trackIndex: Int,
+            @PathVariable trackId: String,
             response: HttpServletResponse,
             request: HttpServletRequest
     ) {
-        val book = bookRepository.bookAtIndex(bookIndex) ?: throw BookNotFoundException()
-        val tracksForBook = bookRepository.tracksForBook(book)
-        val track = tracksForBook.getOrNull(trackIndex) ?: throw TrackNotFoundException()
-
+        val track = bookRepository.track(trackId)
         val headers = HttpHeaders()
         headers.cacheControl = CacheControl.noCache().headerValue
         return MultipartFileSender.fromFile(File(track.path))

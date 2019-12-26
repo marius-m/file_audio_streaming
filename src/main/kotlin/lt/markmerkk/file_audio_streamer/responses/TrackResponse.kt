@@ -1,17 +1,16 @@
 package lt.markmerkk.file_audio_streamer.responses
 
-import lt.markmerkk.file_audio_streamer.models.Book
-import lt.markmerkk.file_audio_streamer.models.Track
+import lt.markmerkk.file_audio_streamer.models.Track2
 
 data class TrackResponse(
-        val bookId: Int,
-        val id: Int,
+        val bookId: String,
+        val id: String,
         val title: String
 ) {
     companion object {
-        fun from(book: Book, track: Track): TrackResponse = TrackResponse(
-                bookId = book.index,
-                id = track.index,
+        fun from(track: Track2): TrackResponse = TrackResponse(
+                bookId = track.bookId,
+                id = track.id,
                 title = track.title
         )
     }

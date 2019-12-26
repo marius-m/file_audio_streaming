@@ -3,7 +3,9 @@ package lt.markmerkk.file_audio_streamer
 import com.nhaarman.mockito_kotlin.doReturn
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.whenever
+import lt.markmerkk.file_audio_streamer.models.Category
 import lt.markmerkk.file_audio_streamer.models.Track
+import lt.markmerkk.file_audio_streamer.models.Track2
 import java.io.File
 
 object Mocks {
@@ -17,6 +19,28 @@ object Mocks {
             bookIndex = bookIndex,
             rawFileName = rawTitle,
             index = index,
+            path = path
+    )
+
+    fun createCategory(
+            id: String = "id1",
+            title: String = "books",
+            path: String = "/root/books"
+    ): Category = Category(
+            id = id,
+            title = title,
+            path = path
+    )
+
+    fun createTrack2(
+            bookId: String = "id1",
+            id: String = "id1",
+            rawTitle: String = "book1.mp3",
+            path: String = "/root/books/book1.mp3"
+    ): Track2 = Track2(
+            bookId = bookId,
+            id = id,
+            rawFileName = rawTitle,
             path = path
     )
 

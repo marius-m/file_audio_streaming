@@ -2,6 +2,7 @@ package lt.markmerkk.file_audio_streamer.fs
 
 import lt.markmerkk.file_audio_streamer.UUIDGen
 import lt.markmerkk.file_audio_streamer.models.Book
+import lt.markmerkk.file_audio_streamer.models.Book2
 import lt.markmerkk.file_audio_streamer.models.Category
 import lt.markmerkk.file_audio_streamer.models.Track
 
@@ -11,13 +12,22 @@ class BookRepository(
         private val uuidGen: UUIDGen
 ) {
 
-    private var categories: List<Category> = emptyList()
+    // category_id by category
+    private var categories: Map<String, Category> = emptyMap()
+    // book_id by category
+    private var books: Map<String, Book2> = emptyMap()
 
     fun renewCache() {
         this.categories = initCategories(rootPathsWithDelimiter = fsSource.rootPathsWithDelimiter)
+                .map { it.id to it }
+                .toMap()
+        this.books = categories.values
+                .flatMap { initBooksForCategory(it) }
+                .map { it.id to it }
+                .toMap()
     }
 
-    fun categories(): List<Category> = categories
+    fun categories(): List<Category> = categories.values.toList()
 
     fun bookAtIndex(index: Int): Book? = books().getOrNull(index)
 
@@ -53,24 +63,30 @@ class BookRepository(
                 .flatMap { fsInteractor.dirsInPath(it) }
                 .map { it.absolutePath }
                 .map { pathToCategory ->
-                    val catName = extractCategoryName(pathToCategory)
+                    val catName = extractNameFromPath(pathToCategory)
                     Category(id = uuidGen.generate(), title = catName, path = pathToCategory)
                 }
     }
 
-    internal fun initBooks(
-            categories: List<Category>
-    ): Map<Category, List<Book>> {
-        TODO()
+    internal fun initBooksForCategory(category: Category): List<Book2> {
+        return fsInteractor.dirsInPath(category.path)
+                .map { it.absolutePath }
+                .map { pathToBook ->
+                    val bookName = extractNameFromPath(pathToBook)
+                    Book2(
+                            categoryId = category.id,
+                            id = uuidGen.generate(),
+                            title = bookName,
+                            path = pathToBook
+                    )
+                }
     }
 
     //endregion
 
     companion object {
         fun tracksPathForBook(rootPath: String, book: Book): String = "$rootPath/${book.title}"
-
-
-        fun extractCategoryName(path: String): String {
+        fun extractNameFromPath(path: String): String {
             return path.split("/").last()
         }
     }

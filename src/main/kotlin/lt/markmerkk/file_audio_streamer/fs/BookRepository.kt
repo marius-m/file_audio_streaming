@@ -1,10 +1,7 @@
 package lt.markmerkk.file_audio_streamer.fs
 
 import lt.markmerkk.file_audio_streamer.UUIDGen
-import lt.markmerkk.file_audio_streamer.models.Book
-import lt.markmerkk.file_audio_streamer.models.Book2
-import lt.markmerkk.file_audio_streamer.models.Category
-import lt.markmerkk.file_audio_streamer.models.Track
+import lt.markmerkk.file_audio_streamer.models.*
 
 class BookRepository(
         private val fsInteractor: FSInteractor,
@@ -16,6 +13,8 @@ class BookRepository(
     private var categories: Map<String, Category> = emptyMap()
     // book_id by category
     private var books: Map<String, Book2> = emptyMap()
+    // track_id by track
+    private var tracks: Map<String, Track2> = emptyMap()
 
     fun renewCache() {
         this.categories = initCategories(rootPathsWithDelimiter = fsSource.rootPathsWithDelimiter)
@@ -23,6 +22,10 @@ class BookRepository(
                 .toMap()
         this.books = categories.values
                 .flatMap { initBooksForCategory(it) }
+                .map { it.id to it }
+                .toMap()
+        this.tracks = books.values
+                .flatMap { initTracksForBook(it) }
                 .map { it.id to it }
                 .toMap()
     }
@@ -78,6 +81,18 @@ class BookRepository(
                             id = uuidGen.generate(),
                             title = bookName,
                             path = pathToBook
+                    )
+                }
+    }
+
+    internal fun initTracksForBook(book: Book2): List<Track2> {
+        return fsInteractor.filesInPath(book.path)
+                .map { trackAsFile ->
+                    Track2(
+                            bookId = book.id,
+                            id = uuidGen.generate(),
+                            rawFileName = trackAsFile.name,
+                            path = trackAsFile.absolutePath
                     )
                 }
     }

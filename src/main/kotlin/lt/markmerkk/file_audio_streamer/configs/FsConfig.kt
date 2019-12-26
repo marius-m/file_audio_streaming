@@ -1,5 +1,6 @@
 package lt.markmerkk.file_audio_streamer.configs
 
+import lt.markmerkk.file_audio_streamer.UUIDGen
 import lt.markmerkk.file_audio_streamer.fs.BookRepository
 import lt.markmerkk.file_audio_streamer.fs.FSInteractor
 import lt.markmerkk.file_audio_streamer.fs.FSSource
@@ -17,6 +18,13 @@ import org.springframework.core.io.ResourceLoader
 class FsConfig {
 
     @Bean
+    open fun provideUUID(
+            env: Environment
+    ): UUIDGen {
+        return UUIDGen()
+    }
+
+    @Bean
     open fun provideCredentials(
             env: Environment
     ): Credentials {
@@ -28,9 +36,9 @@ class FsConfig {
 
     @Bean
     open fun provideFsConfig(
-            @Value("\${categoriesAsArgs}") categoriesAsArgs: String
+            @Value("\${rootPaths}") rootPaths: String
     ): FSSource {
-        return FSSource("", categoriesAsArgs)
+        return FSSource("", rootPaths)
     }
 
     @Bean
@@ -43,9 +51,10 @@ class FsConfig {
     @Bean
     open fun bookRepository(
             fsInteractor: FSInteractor,
-            fsSource: FSSource
+            fsSource: FSSource,
+            uuidGen: UUIDGen
     ): BookRepository {
-        return BookRepository(fsInteractor, fsSource)
+        return BookRepository(fsInteractor, fsSource, uuidGen)
     }
 
 }

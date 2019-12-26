@@ -3,6 +3,7 @@ package lt.markmerkk.file_audio_streamer.fs
 import com.nhaarman.mockito_kotlin.doReturn
 import com.nhaarman.mockito_kotlin.whenever
 import lt.markmerkk.file_audio_streamer.Mocks
+import lt.markmerkk.file_audio_streamer.UUIDGen
 import lt.markmerkk.file_audio_streamer.models.Book
 import lt.markmerkk.file_audio_streamer.models.Track
 import org.assertj.core.api.Assertions.assertThat
@@ -16,6 +17,7 @@ class BookRepositoryTracksForBookTest {
 
     @Mock lateinit var fsInteractor: FSInteractor
     @Mock lateinit var fsSource: FSSource
+    @Mock lateinit var uuidGen: UUIDGen
     lateinit var bookRepository: BookRepository
 
     private val rootPath = "books"
@@ -25,7 +27,8 @@ class BookRepositoryTracksForBookTest {
         MockitoAnnotations.initMocks(this)
         bookRepository = BookRepository(
                 fsInteractor = fsInteractor,
-                fsSource = fsSource
+                fsSource = fsSource,
+                uuidGen = uuidGen
         )
         doReturn("books").whenever(fsSource).rootPath
     }

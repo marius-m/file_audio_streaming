@@ -4,6 +4,7 @@ import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.doReturn
 import com.nhaarman.mockito_kotlin.whenever
 import lt.markmerkk.file_audio_streamer.Mocks
+import lt.markmerkk.file_audio_streamer.UUIDGen
 import lt.markmerkk.file_audio_streamer.models.Book
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
@@ -16,6 +17,7 @@ class BookRepositoryBooksTest {
 
     @Mock lateinit var fsInteractor: FSInteractor
     @Mock lateinit var fsSource: FSSource
+    @Mock lateinit var uuidGen: UUIDGen
     lateinit var bookRepository: BookRepository
 
     @Before
@@ -23,7 +25,8 @@ class BookRepositoryBooksTest {
         MockitoAnnotations.initMocks(this)
         bookRepository = BookRepository(
                 fsInteractor = fsInteractor,
-                fsSource = fsSource
+                fsSource = fsSource,
+                uuidGen = uuidGen
         )
     }
 

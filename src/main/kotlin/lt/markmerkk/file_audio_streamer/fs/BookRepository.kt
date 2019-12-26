@@ -41,6 +41,7 @@ class BookRepository(
                 .mapIndexed { index, file ->  Book.from(index, file) }
     }
 
+    @Deprecated("Not used any more")
     fun trackAtIndex(book: Book, index: Int): Track? = tracksForBook(book).getOrNull(index)
 
     fun tracksForBook(book: Book): List<Track> {
@@ -73,6 +74,7 @@ class BookRepository(
 
     internal fun initBooksForCategory(category: Category): List<Book2> {
         return fsInteractor.dirsInPath(category.path)
+                .filter { it.isDirectory }
                 .map { it.absolutePath }
                 .map { pathToBook ->
                     val bookName = extractNameFromPath(pathToBook)
@@ -95,6 +97,7 @@ class BookRepository(
                             path = trackAsFile.absolutePath
                     )
                 }
+                .filter { it.isSupported() }
     }
 
     //endregion

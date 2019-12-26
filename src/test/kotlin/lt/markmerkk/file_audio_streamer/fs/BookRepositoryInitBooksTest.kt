@@ -51,4 +51,23 @@ class BookRepositoryInitBooksTest {
         assertThat(book1.path).isEqualTo("/root/books/book1")
     }
 
+    @Test
+    fun fileInDirectory() {
+        // Assemble
+        val category1 = Mocks.createCategory(
+                id = "c_id1",
+                path = "/root/books"
+        )
+        doReturn("b_id1").whenever(uuidGen).generate()
+        val bookPath1 = Mocks.mockFile(isDirectory = false, absolutePath = "/root/books/book1.mp3")
+        doReturn(listOf(bookPath1))
+                .whenever(fsInteractor).dirsInPath("/root/books") // should not happen
+
+        // Act
+        val result = bookRepository.initBooksForCategory(category1)
+
+        // Assert
+        assertThat(result).isEmpty()
+    }
+
 }

@@ -28,6 +28,7 @@ class FSInteractor(
                 .file
         if (rootFile.exists() && rootFile.isDirectory) {
             return rootFile.listFiles().toList()
+                    .filter { it.isFile }
         }
         return listOf(rootFile)
     }

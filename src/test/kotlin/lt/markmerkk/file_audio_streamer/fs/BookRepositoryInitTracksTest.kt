@@ -28,7 +28,7 @@ class BookRepositoryInitTracksTest {
     }
 
     @Test
-    fun validBooks() {
+    fun valid() {
         // Assemble
         val book1 = Mocks.createBook(id = "b_id1", path = "/root/books/book1")
         val trackPath1 = Mocks.mockFile(
@@ -49,6 +49,46 @@ class BookRepositoryInitTracksTest {
         assertThat(track.id).isEqualTo("t_id1")
         assertThat(track.rawFileName).isEqualTo("book1.mp3")
         assertThat(track.path).isEqualTo("/root/books/book1/book1.mp3")
+    }
+
+    @Test
+    fun directoryInBookPath() {
+        // Assemble
+        val book1 = Mocks.createBook(id = "b_id1", path = "/root/books/book1")
+        val trackPath1 = Mocks.mockFile(
+                isFile = false,
+                name = "book1",
+                absolutePath = "/root/books/book1/book1"
+        )
+        doReturn("t_id1").whenever(uuidGen).generate()
+        doReturn(listOf(trackPath1)) // should not happen
+                .whenever(fsInteractor).filesInPath("/root/books/book1")
+
+        // Act
+        val result = bookRepository.initTracksForBook(book1)
+
+        // Assert
+        assertThat(result).isEmpty()
+    }
+
+    @Test
+    fun unsupportedTrackType() {
+        // Assemble
+        val book1 = Mocks.createBook(id = "b_id1", path = "/root/books/book1")
+        val trackPath1 = Mocks.mockFile(
+                isFile = true,
+                name = "book1.jpg",
+                absolutePath = "/root/books/book1/book1.jpg"
+        )
+        doReturn("t_id1").whenever(uuidGen).generate()
+        doReturn(listOf(trackPath1))
+                .whenever(fsInteractor).filesInPath("/root/books/book1")
+
+        // Act
+        val result = bookRepository.initTracksForBook(book1)
+
+        // Assert
+        assertThat(result).isEmpty()
     }
 
 }

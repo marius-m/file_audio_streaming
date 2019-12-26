@@ -3,6 +3,7 @@ package lt.markmerkk.file_audio_streamer.models
 import lt.markmerkk.file_audio_streamer.Consts
 import java.io.File
 
+@Deprecated("Use Track2")
 data class Track(
         val bookIndex: Int,
         val rawFileName: String,

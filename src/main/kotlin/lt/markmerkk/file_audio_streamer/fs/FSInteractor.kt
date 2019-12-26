@@ -9,6 +9,18 @@ class FSInteractor(
         private val resourceLoader: ResourceLoader
 ) {
 
+    fun dirsInPath(path: String): List<File> {
+        val rootFile: File = ResourcePatternUtils
+                .getResourcePatternResolver(resourceLoader)
+                .getResource("file:$path")
+                .file
+        if (rootFile.exists() && rootFile.isDirectory) {
+            return rootFile.listFiles()
+                    .filter { it.isDirectory }
+        }
+        return emptyList()
+    }
+
     fun filesInPath(path: String): List<File> {
         val rootFile: File = ResourcePatternUtils
                 .getResourcePatternResolver(resourceLoader)
@@ -16,6 +28,7 @@ class FSInteractor(
                 .file
         if (rootFile.exists() && rootFile.isDirectory) {
             return rootFile.listFiles().toList()
+                    .filter { it.isFile }
         }
         return listOf(rootFile)
     }

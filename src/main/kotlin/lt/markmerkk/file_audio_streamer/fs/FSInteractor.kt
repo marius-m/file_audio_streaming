@@ -15,7 +15,7 @@ class FSInteractor(
                 .getResource("file:$path")
                 .file
         if (rootFile.exists() && rootFile.isDirectory) {
-            return rootFile.listFiles()
+            return rootFile.safeListFiles()
                     .filter { it.isDirectory }
         }
         return emptyList()
@@ -27,7 +27,7 @@ class FSInteractor(
                 .getResource("file:$path")
                 .file
         if (rootFile.exists() && rootFile.isDirectory) {
-            return rootFile.listFiles().toList()
+            return rootFile.safeListFiles()
                     .filter { it.isFile }
         }
         return listOf(rootFile)
@@ -36,4 +36,9 @@ class FSInteractor(
     fun fileAsResource(absoluteFilePath: String): Resource = ResourcePatternUtils
             .getResourcePatternResolver(resourceLoader)
             .getResource("file:$absoluteFilePath")
+
+}
+
+fun File.safeListFiles(): List<File> {
+    return listFiles()?.toList() ?: emptyList<File>()
 }

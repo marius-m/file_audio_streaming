@@ -1,6 +1,9 @@
 package lt.markmerkk.file_audio_streamer.configs
 
 import lt.markmerkk.file_audio_streamer.UUIDGen
+import lt.markmerkk.file_audio_streamer.daos.BookDao
+import lt.markmerkk.file_audio_streamer.daos.CategoryDao
+import lt.markmerkk.file_audio_streamer.daos.TrackDao
 import lt.markmerkk.file_audio_streamer.fs.BookRepository
 import lt.markmerkk.file_audio_streamer.fs.FSInteractor
 import lt.markmerkk.file_audio_streamer.fs.FSSource
@@ -51,10 +54,19 @@ class ComponentsConfig {
     open fun bookRepository(
             fsInteractor: FSInteractor,
             fsSource: FSSource,
-            uuidGen: UUIDGen
+            uuidGen: UUIDGen,
+            categoryDao: CategoryDao,
+            bookDao: BookDao,
+            trackDao: TrackDao
     ): BookRepository {
-        return BookRepository(fsInteractor, fsSource, uuidGen)
-                .apply { renewCache() }
+        return BookRepository(
+                fsInteractor,
+                fsSource,
+                uuidGen,
+                categoryDao,
+                bookDao,
+                trackDao
+        ).apply { renewCache() }
     }
 
 }

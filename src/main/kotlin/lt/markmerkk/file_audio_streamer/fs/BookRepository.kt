@@ -1,64 +1,79 @@
 package lt.markmerkk.file_audio_streamer.fs
 
 import lt.markmerkk.file_audio_streamer.UUIDGen
+import lt.markmerkk.file_audio_streamer.daos.BookDao
+import lt.markmerkk.file_audio_streamer.daos.CategoryDao
+import lt.markmerkk.file_audio_streamer.daos.TrackDao
 import lt.markmerkk.file_audio_streamer.models.Book2
 import lt.markmerkk.file_audio_streamer.models.Category
 import lt.markmerkk.file_audio_streamer.models.Track2
+import lt.markmerkk.file_audio_streamer.models.jpa.BookEntity
+import lt.markmerkk.file_audio_streamer.models.jpa.CategoryEntity
+import lt.markmerkk.file_audio_streamer.models.jpa.TrackEntity
 
 class BookRepository(
         private val fsInteractor: FSInteractor,
         private val fsSource: FSSource,
-        private val uuidGen: UUIDGen
+        private val uuidGen: UUIDGen,
+        private val categoryDao: CategoryDao,
+        private val bookDao: BookDao,
+        private val trackDao: TrackDao
 ) {
 
-    // category_id by category
-    private var categories: Map<String, Category> = emptyMap()
-    // book_id by category
-    private var books: Map<String, Book2> = emptyMap()
-    // track_id by track
-    private var tracks: Map<String, Track2> = emptyMap()
-
     fun renewCache() {
-        this.categories = initCategories(rootPathsWithDelimiter = fsSource.rootPathsWithDelimiter)
+        categoryDao.deleteAll()
+        bookDao.deleteAll()
+        trackDao.deleteAll()
+        val categories = initCategories(rootPathsWithDelimiter = fsSource.rootPathsWithDelimiter)
                 .map { it.id to it }
                 .toMap()
-        this.books = categories.values
+        val categoriesAsDaoObj = categories.values
+                .map { CategoryEntity.from(it) }
+        categoryDao.saveAll(categoriesAsDaoObj)
+        val books = categories.values
                 .flatMap { initBooksForCategory(it) }
                 .map { it.id to it }
                 .toMap()
-        this.tracks = books.values
+        val booksAsDaoObj = books.values
+                .map { BookEntity.from(it) }
+        bookDao.saveAll(booksAsDaoObj)
+        val tracks = books.values
                 .flatMap { initTracksForBook(it) }
                 .map { it.id to it }
                 .toMap()
+        val tracksAsDaoObj = tracks.values
+                .map { TrackEntity.from(it) }
+        trackDao.saveAll(tracksAsDaoObj)
     }
 
-    fun categories(): List<Category> = categories.values.toList()
+    fun categories(): List<Category> {
+        return categoryDao
+                .findAll()
+                .map { it.toCategory() }
+    }
 
     @Throws(IllegalArgumentException::class)
     fun categoryBooks(categoryId: String): List<Book2> {
-        val category = categories[categoryId] ?: throw IllegalArgumentException("No such category")
-        return books.values
-                .filter { it.categoryId == category.id }
+        val category = categoryDao.findByLocalId(categoryId) ?: throw IllegalArgumentException("No such category")
+        return bookDao.findByCategoryId(categoryId)
+                .map { it.toBook() }
     }
 
     fun books(): List<Book2> {
-        return this
-                .books
-                .values
-                .toList()
+        return bookDao.findAll()
+                .map { it.toBook() }
     }
 
     @Throws(IllegalArgumentException::class)
     fun tracksForBook(bookId: String): List<Track2> {
-        val book = books[bookId] ?: throw IllegalArgumentException("No such book")
-        return tracks
-                .values
-                .filter { it.bookId == book.id }
+        val book = bookDao.findByLocalId(bookId) ?: throw IllegalArgumentException("No such book")
+        return trackDao.findByBookId(bookId)
+                .map { it.toTrack() }
     }
 
     @Throws(IllegalArgumentException::class)
     fun track(trackId: String): Track2 {
-        return tracks[trackId] ?: throw IllegalArgumentException("No such track")
+        return trackDao.findByLocalId(trackId)?.toTrack() ?: throw IllegalArgumentException("No such track")
     }
 
     //region Convenience

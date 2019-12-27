@@ -5,23 +5,10 @@ import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.whenever
 import lt.markmerkk.file_audio_streamer.models.Book2
 import lt.markmerkk.file_audio_streamer.models.Category
-import lt.markmerkk.file_audio_streamer.models.Track
 import lt.markmerkk.file_audio_streamer.models.Track2
 import java.io.File
 
 object Mocks {
-
-    fun createTrack(
-            bookIndex: Int = 0,
-            index: Int = 0,
-            rawTitle: String = "valid_title_$index.mp3",
-            path: String = "valid_path"
-    ): Track = Track(
-            bookIndex = bookIndex,
-            rawFileName = rawTitle,
-            index = index,
-            path = path
-    )
 
     fun createCategory(
             id: String = "id1",

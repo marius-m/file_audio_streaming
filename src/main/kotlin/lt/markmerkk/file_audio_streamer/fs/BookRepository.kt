@@ -1,7 +1,6 @@
 package lt.markmerkk.file_audio_streamer.fs
 
 import lt.markmerkk.file_audio_streamer.UUIDGen
-import lt.markmerkk.file_audio_streamer.models.Book
 import lt.markmerkk.file_audio_streamer.models.Book2
 import lt.markmerkk.file_audio_streamer.models.Category
 import lt.markmerkk.file_audio_streamer.models.Track2
@@ -112,7 +111,6 @@ class BookRepository(
     //endregion
 
     companion object {
-        fun tracksPathForBook(rootPath: String, book: Book): String = "$rootPath/${book.title}"
         fun extractNameFromPath(path: String): String {
             return path.split("/").last()
         }

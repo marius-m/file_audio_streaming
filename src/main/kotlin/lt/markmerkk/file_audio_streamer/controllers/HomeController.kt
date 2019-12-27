@@ -23,7 +23,7 @@ class HomeController(
     fun renderIndex(
             model: Model
     ): String {
-        val navItems = listOf(NavItem.asRoot())
+        val navItems = listOf(NavItem.asRoot().makeActive())
         model.addAttribute("navItems", navItems)
         model.addAttribute("categories", bookRepository.categories())
         return "categories"
@@ -37,7 +37,7 @@ class HomeController(
             model: Model,
             @PathVariable categoryId: String
     ): String {
-        val navItems = listOf(NavItem.asRoot(), NavItem.asCategoryBooks(categoryId))
+        val navItems = listOf(NavItem.asRoot(), NavItem.asCategoryBooks(categoryId).makeActive())
         model.addAttribute("navItems", navItems)
         model.addAttribute("categoryId", categoryId)
         model.addAttribute("books", bookRepository.categoryBooks(categoryId))
@@ -51,7 +51,7 @@ class HomeController(
     fun renderAllBooks(
             model: Model
     ): String {
-        val navItems = listOf(NavItem.asRoot(), NavItem.asBooks())
+        val navItems = listOf(NavItem.asRoot(), NavItem.asBooks().makeActive())
         model.addAttribute("navItems", navItems)
         model.addAttribute("books", bookRepository.books())
         return "books"
@@ -65,7 +65,7 @@ class HomeController(
             model: Model,
             @PathVariable bookId: String
     ): String {
-        val navItems = listOf(NavItem.asRoot(), NavItem.asBooks(), NavItem.asBook(bookId))
+        val navItems = listOf(NavItem.asRoot(), NavItem.asBooks(), NavItem.asBook(bookId).makeActive())
         model.addAttribute("navItems", navItems)
         model.addAttribute("bookId", bookId)
         model.addAttribute("tracks", bookRepository.tracksForBook(bookId))

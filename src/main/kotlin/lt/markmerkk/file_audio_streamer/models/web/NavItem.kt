@@ -3,8 +3,11 @@ package lt.markmerkk.file_audio_streamer.models.web
 data class NavItem(
         val title: String,
         val path: String,
-        val isActive: Boolean = false
+        val active: Boolean = false
 ) {
+
+    fun makeActive(): NavItem = NavItem(title = title, path = path, active = true)
+
     companion object {
         fun asRoot(): NavItem = NavItem(title = "Categories", path = "/")
         fun asCategoryBooks(categoryId: String): NavItem = NavItem(title = "Books", path = "/categories/$categoryId/books")

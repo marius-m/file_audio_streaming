@@ -4,7 +4,16 @@
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
             <th:block th:each="item : ${navItems}">
-                <li class="breadcrumb-item"><a th:href="${item.path}" th:text="${item.title}"></a></li>
+                <th:block th:if="${item.active}">
+                    <li class="breadcrumb-item" aria-current="page" active>
+                        <a th:text="${item.title}"></a>
+                    </li>
+                </th:block>
+                <th:block th:unless="${item.active}">
+                    <li class="breadcrumb-item">
+                        <a th:href="${item.path}" th:text="${item.title}"></a>
+                    </li>
+                </th:block>
             </th:block>
         </ol>
     </nav>

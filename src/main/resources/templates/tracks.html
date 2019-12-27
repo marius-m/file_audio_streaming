@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="fragments/frag_res :: css"/>
+</head>
+<body>
+<div class="container">
+    <h1 th:text="'Tracks for book (' + ${bookId} + ')'"></h1>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Title</th>
+                <th scope="col">Play</th>
+            </tr>
+            </thead>
+            <tbody>
+            <th:block th:each="track : ${tracks}">
+                <tr>
+                    <th scope="row" th:text="${track.id}"></th>
+                    <td>
+                        <span th:text="${track.title}"></span>
+                    </td>
+                    <td>
+                        <audio controls preload="metadata">
+                            <source th:src="@{/api/tracks/} + ${track.id}" type="audio/mp3">
+                            Your browser does not support the audio element.
+                        </audio>
+                    </td>
+                </tr>
+            </th:block>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<th:block th:replace="fragments/frag_res :: js"/>
+</body>
+</html>

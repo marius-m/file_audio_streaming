@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="fragments/frag_res :: css"/>
+</head>
+<body>
+<div class="container">
+    <h1 th:text="'Books for category(' + ${categoryId} + ')'"></h1>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Title</th>
+            </tr>
+            </thead>
+            <tbody>
+            <th:block th:each="book : ${books}">
+                <tr>
+                    <th scope="row" th:text="${book.id}"></th>
+                    <td>
+                        <a th:href="@{/books/} + ${book.id}">
+                            <span th:text="${book.title}"></span>
+                        </a>
+                    </td>
+                </tr>
+            </th:block>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<th:block th:replace="fragments/frag_res :: js"/>
+</body>
+</html>

@@ -20,7 +20,7 @@
                 <tr>
                     <th scope="row" th:text="${book.id}"></th>
                     <td>
-                        <a th:href="@{/books/} + ${book.id}">
+                        <a th:href="@{/categories/} + ${categoryId} + '/books/' + ${book.id}">
                             <span th:text="${book.title}"></span>
                         </a>
                     </td>

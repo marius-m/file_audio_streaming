@@ -4,7 +4,6 @@ import lt.markmerkk.file_audio_streamer.UUIDGen
 import lt.markmerkk.file_audio_streamer.fs.BookRepository
 import lt.markmerkk.file_audio_streamer.fs.FSInteractor
 import lt.markmerkk.file_audio_streamer.fs.FSSource
-import lt.markmerkk.file_audio_streamer.models.Category
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -15,7 +14,7 @@ import org.springframework.core.io.ResourceLoader
 
 @Configuration
 @PropertySource("classpath:creds.properties", ignoreResourceNotFound = true)
-class FsConfig {
+class ComponentsConfig {
 
     @Bean
     open fun provideUUID(

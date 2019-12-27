@@ -17,4 +17,8 @@ class Credentials(
         return "$username / $password"
     }
 
+    companion object {
+        fun asEmpty(): Credentials = Credentials("", "")
+    }
+
 }

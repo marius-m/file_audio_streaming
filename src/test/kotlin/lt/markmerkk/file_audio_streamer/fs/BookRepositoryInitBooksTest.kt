@@ -1,9 +1,13 @@
 package lt.markmerkk.file_audio_streamer.fs
 
+import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.doReturn
 import com.nhaarman.mockito_kotlin.whenever
 import lt.markmerkk.file_audio_streamer.Mocks
 import lt.markmerkk.file_audio_streamer.UUIDGen
+import lt.markmerkk.file_audio_streamer.daos.BookDao
+import lt.markmerkk.file_audio_streamer.daos.CategoryDao
+import lt.markmerkk.file_audio_streamer.daos.TrackDao
 import lt.markmerkk.file_audio_streamer.models.Book2
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
@@ -16,6 +20,9 @@ class BookRepositoryInitBooksTest {
     @Mock lateinit var fsInteractor: FSInteractor
     @Mock lateinit var fsSource: FSSource
     @Mock lateinit var uuidGen: UUIDGen
+    @Mock lateinit var categoryDao: CategoryDao
+    @Mock lateinit var booksDao: BookDao
+    @Mock lateinit var tracksDao: TrackDao
     lateinit var bookRepository: BookRepository
 
     @Before
@@ -24,7 +31,10 @@ class BookRepositoryInitBooksTest {
         bookRepository = BookRepository(
                 fsInteractor = fsInteractor,
                 fsSource = fsSource,
-                uuidGen = uuidGen
+                uuidGen = uuidGen,
+                categoryDao = categoryDao,
+                bookDao = booksDao,
+                trackDao = tracksDao
         )
     }
 
@@ -35,7 +45,7 @@ class BookRepositoryInitBooksTest {
                 id = "c_id1",
                 path = "/root/books"
         )
-        doReturn("b_id1").whenever(uuidGen).generate()
+        doReturn("b_id1").whenever(uuidGen).genFrom(any())
         val bookPath1 = Mocks.mockFile(isDirectory = true, absolutePath = "/root/books/book1")
         doReturn(listOf(bookPath1))
                 .whenever(fsInteractor).dirsInPath("/root/books")
@@ -58,7 +68,7 @@ class BookRepositoryInitBooksTest {
                 id = "c_id1",
                 path = "/root/books"
         )
-        doReturn("b_id1").whenever(uuidGen).generate()
+        doReturn("b_id1").whenever(uuidGen).genFrom(any())
         val bookPath1 = Mocks.mockFile(isDirectory = false, absolutePath = "/root/books/book1.mp3")
         doReturn(listOf(bookPath1))
                 .whenever(fsInteractor).dirsInPath("/root/books") // should not happen

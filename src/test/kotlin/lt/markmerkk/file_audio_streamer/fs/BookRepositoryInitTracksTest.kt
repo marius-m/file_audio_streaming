@@ -1,9 +1,13 @@
 package lt.markmerkk.file_audio_streamer.fs
 
+import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.doReturn
 import com.nhaarman.mockito_kotlin.whenever
 import lt.markmerkk.file_audio_streamer.Mocks
 import lt.markmerkk.file_audio_streamer.UUIDGen
+import lt.markmerkk.file_audio_streamer.daos.BookDao
+import lt.markmerkk.file_audio_streamer.daos.CategoryDao
+import lt.markmerkk.file_audio_streamer.daos.TrackDao
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
 import org.junit.Test
@@ -15,6 +19,9 @@ class BookRepositoryInitTracksTest {
     @Mock lateinit var fsInteractor: FSInteractor
     @Mock lateinit var fsSource: FSSource
     @Mock lateinit var uuidGen: UUIDGen
+    @Mock lateinit var categoryDao: CategoryDao
+    @Mock lateinit var booksDao: BookDao
+    @Mock lateinit var tracksDao: TrackDao
     lateinit var bookRepository: BookRepository
 
     @Before
@@ -23,7 +30,10 @@ class BookRepositoryInitTracksTest {
         bookRepository = BookRepository(
                 fsInteractor = fsInteractor,
                 fsSource = fsSource,
-                uuidGen = uuidGen
+                uuidGen = uuidGen,
+                categoryDao = categoryDao,
+                bookDao = booksDao,
+                trackDao = tracksDao
         )
     }
 
@@ -36,7 +46,7 @@ class BookRepositoryInitTracksTest {
                 name = "book1.mp3",
                 absolutePath = "/root/books/book1/book1.mp3"
         )
-        doReturn("t_id1").whenever(uuidGen).generate()
+        doReturn("t_id1").whenever(uuidGen).genFrom(any())
         doReturn(listOf(trackPath1))
                 .whenever(fsInteractor).filesInPath("/root/books/book1")
 
@@ -60,7 +70,7 @@ class BookRepositoryInitTracksTest {
                 name = "book1",
                 absolutePath = "/root/books/book1/book1"
         )
-        doReturn("t_id1").whenever(uuidGen).generate()
+        doReturn("t_id1").whenever(uuidGen).genFrom(any())
         doReturn(listOf(trackPath1)) // should not happen
                 .whenever(fsInteractor).filesInPath("/root/books/book1")
 
@@ -80,7 +90,7 @@ class BookRepositoryInitTracksTest {
                 name = "book1.jpg",
                 absolutePath = "/root/books/book1/book1.jpg"
         )
-        doReturn("t_id1").whenever(uuidGen).generate()
+        doReturn("t_id1").whenever(uuidGen).genFrom(any())
         doReturn(listOf(trackPath1))
                 .whenever(fsInteractor).filesInPath("/root/books/book1")
 

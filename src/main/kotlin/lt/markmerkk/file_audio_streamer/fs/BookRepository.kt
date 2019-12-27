@@ -91,7 +91,7 @@ class BookRepository(
                 .map { it.absolutePath }
                 .map { pathToCategory ->
                     val catName = extractNameFromPath(pathToCategory)
-                    Category(id = uuidGen.generate(), title = catName, path = pathToCategory)
+                    Category(id = uuidGen.genFrom(pathToCategory), title = catName, path = pathToCategory)
                 }
     }
 
@@ -103,7 +103,7 @@ class BookRepository(
                     val bookName = extractNameFromPath(pathToBook)
                     Book2(
                             categoryId = category.id,
-                            id = uuidGen.generate(),
+                            id = uuidGen.genFrom(pathToBook),
                             title = bookName,
                             path = pathToBook
                     )
@@ -115,7 +115,7 @@ class BookRepository(
                 .map { trackAsFile ->
                     Track2(
                             bookId = book.id,
-                            id = uuidGen.generate(),
+                            id = uuidGen.genFrom(trackAsFile.absolutePath),
                             rawFileName = trackAsFile.name,
                             path = trackAsFile.absolutePath
                     )

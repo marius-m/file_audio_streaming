@@ -1,10 +1,11 @@
 package lt.markmerkk.file_audio_streamer
 
-import java.util.*
+import org.apache.commons.codec.digest.DigestUtils
 
 class UUIDGen {
-    fun generate(): String {
-        return UUID.randomUUID()
-                .toString()
+
+    fun genFrom(filePath: String): String {
+        return DigestUtils.md5Hex(filePath)
     }
+
 }

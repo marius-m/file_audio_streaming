@@ -1,9 +1,13 @@
 package lt.markmerkk.file_audio_streamer.fs
 
+import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.doReturn
 import com.nhaarman.mockito_kotlin.whenever
 import lt.markmerkk.file_audio_streamer.Mocks
 import lt.markmerkk.file_audio_streamer.UUIDGen
+import lt.markmerkk.file_audio_streamer.daos.BookDao
+import lt.markmerkk.file_audio_streamer.daos.CategoryDao
+import lt.markmerkk.file_audio_streamer.daos.TrackDao
 import lt.markmerkk.file_audio_streamer.models.Category
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
@@ -16,6 +20,9 @@ class BookRepositoryInitCategoriesTest {
     @Mock lateinit var fsInteractor: FSInteractor
     @Mock lateinit var fsSource: FSSource
     @Mock lateinit var uuidGen: UUIDGen
+    @Mock lateinit var categoryDao: CategoryDao
+    @Mock lateinit var booksDao: BookDao
+    @Mock lateinit var tracksDao: TrackDao
     lateinit var bookRepository: BookRepository
 
     @Before
@@ -24,7 +31,10 @@ class BookRepositoryInitCategoriesTest {
         bookRepository = BookRepository(
                 fsInteractor = fsInteractor,
                 fsSource = fsSource,
-                uuidGen = uuidGen
+                uuidGen = uuidGen,
+                categoryDao = categoryDao,
+                bookDao = booksDao,
+                trackDao = tracksDao
         )
     }
 
@@ -40,7 +50,7 @@ class BookRepositoryInitCategoriesTest {
     @Test
     fun oneCategory() {
         // Assemble
-        doReturn("id1").whenever(uuidGen).generate()
+        doReturn("id1").whenever(uuidGen).genFrom(any())
         doReturn(listOf(Mocks.mockFile(absolutePath = "/root/books/book1")))
                 .whenever(fsInteractor).dirsInPath("/root/books")
 
@@ -64,7 +74,7 @@ class BookRepositoryInitCategoriesTest {
         doReturn("id1")
                 .doReturn("id2")
                 .doReturn("id3")
-                .whenever(uuidGen).generate()
+                .whenever(uuidGen).genFrom(any())
         doReturn(categories)
                 .whenever(fsInteractor).dirsInPath("/root/books")
 
@@ -85,7 +95,7 @@ class BookRepositoryInitCategoriesTest {
         doReturn("id1")
                 .doReturn("id2")
                 .doReturn("id3")
-                .whenever(uuidGen).generate()
+                .whenever(uuidGen).genFrom(any())
         doReturn(listOf(Mocks.mockFile(absolutePath = "/root/books/book1")))
                 .whenever(fsInteractor).dirsInPath("/root/books")
         doReturn(listOf(Mocks.mockFile(absolutePath = "/root/books2/book1")))

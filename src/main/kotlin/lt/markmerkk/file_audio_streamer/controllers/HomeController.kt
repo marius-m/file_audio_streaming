@@ -24,7 +24,10 @@ class HomeController(
     ): String {
         val navItems = listOf(NavItem.asRoot(), NavItem.asCategories().makeActive())
         model.addAttribute("navItems", navItems)
-        model.addAttribute("categories", bookRepository.categories())
+        val categories = bookRepository
+                .categories()
+                .sortedByDescending { it.title }
+        model.addAttribute("categories", categories)
         return "categories"
     }
 
@@ -43,7 +46,10 @@ class HomeController(
         )
         model.addAttribute("navItems", navItems)
         model.addAttribute("categoryId", categoryId)
-        model.addAttribute("books", bookRepository.categoryBooks(categoryId))
+        val categoryBooks = bookRepository
+                .categoryBooks(categoryId)
+                .sortedByDescending { it.title }
+        model.addAttribute("books", categoryBooks)
         return "cat_books"
     }
 
@@ -60,7 +66,10 @@ class HomeController(
                 NavItem.asBooks().makeActive()
         )
         model.addAttribute("navItems", navItems)
-        model.addAttribute("books", bookRepository.books())
+        val books = bookRepository
+                .books()
+                .sortedByDescending { it.title }
+        model.addAttribute("books", books)
         return "books"
     }
 
@@ -82,7 +91,10 @@ class HomeController(
         model.addAttribute("navItems", navItems)
         model.addAttribute("categoryId", categoryId)
         model.addAttribute("bookId", bookId)
-        model.addAttribute("tracks", bookRepository.tracksForBook(bookId))
+        val tracksForBook = bookRepository
+                .tracksForBook(bookId)
+                .sortedByDescending { it.title }
+        model.addAttribute("tracks", tracksForBook)
         return "tracks"
     }
 

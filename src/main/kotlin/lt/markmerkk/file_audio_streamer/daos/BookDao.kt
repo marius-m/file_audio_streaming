@@ -7,4 +7,5 @@ interface BookDao : CrudRepository<BookEntity, Long> {
     fun findByLocalId(localId: String): BookEntity?
     fun findByCategoryId(categoryId: String): List<BookEntity>
     fun findByTitleEngContains(titleEng: String): List<BookEntity>
+    fun findByTitleEngContainsAndCategoryId(titleEng: String, categoryId: String): List<BookEntity>
 }

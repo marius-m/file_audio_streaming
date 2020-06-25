@@ -52,11 +52,11 @@ class HomeController(
         val keyword = formEntitySearch.keyword
         val books = if (keyword.isNullOrEmpty()) {
             bookRepository
-                    .books()
+                    .categoryBooks(categoryId)
                     .sortedBy { it.title }
         } else {
             bookRepository
-                    .bookSearch(keyword)
+                    .bookSearch(keyword, categoryId)
                     .sortedBy { it.title }
         }
         model.addAttribute("books", books)

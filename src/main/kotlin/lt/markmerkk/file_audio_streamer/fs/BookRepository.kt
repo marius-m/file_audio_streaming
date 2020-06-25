@@ -10,6 +10,7 @@ import lt.markmerkk.file_audio_streamer.models.Track2
 import lt.markmerkk.file_audio_streamer.models.jpa.BookEntity
 import lt.markmerkk.file_audio_streamer.models.jpa.CategoryEntity
 import lt.markmerkk.file_audio_streamer.models.jpa.TrackEntity
+import org.apache.commons.lang3.time.StopWatch
 import org.slf4j.LoggerFactory
 
 class BookRepository(
@@ -22,6 +23,7 @@ class BookRepository(
 ) {
 
     fun renewCache() {
+        val sw = StopWatch().apply { start() }
         l.info("Renewing cache")
         categoryDao.deleteAll()
         bookDao.deleteAll()
@@ -33,6 +35,7 @@ class BookRepository(
         val categoriesAsDaoObj = categories.values
                 .map { CategoryEntity.from(it) }
         categoryDao.saveAll(categoriesAsDaoObj)
+        l.info("Category scan finish (${sw.time}ms)")
         l.info("Looking for books...")
         val books: Map<String, Book2> = categories.values
                 .flatMap { initBooksForCategory(it) }
@@ -41,6 +44,7 @@ class BookRepository(
         val booksAsDaoObj = books.values
                 .map { BookEntity.from(it) }
         bookDao.saveAll(booksAsDaoObj)
+        l.info("Book scan finish (${sw.time}ms)")
         l.info("Looking for tracks...")
         val tracks: Map<String, Track2> = books.values
                 .flatMap { initTracksForBook(it) }
@@ -49,16 +53,26 @@ class BookRepository(
         val tracksAsDaoObj = tracks.values
                 .map { TrackEntity.from(it) }
         trackDao.saveAll(tracksAsDaoObj)
+        l.info("Track scan finish (${sw.time}ms)")
         l.info("Removing books with empty tracks...")
-        val emptyBooks = bookDao.findAll()
-                .filter {
-                    trackDao.findByBookId(it.localId)
-                            .count() == 0
+        val emptyBooks = books.values
+                .filter { book ->
+                    val trackCountForBook = tracks
+                            .filter { track -> track.value.bookId == book.id }
+                            .count()
+                    trackCountForBook == 0
                 }
-        emptyBooks.forEach { book ->
+        emptyBooks
+                .forEach { book ->
                     l.info("Rm Book (${book.id} / ${book.title} / ${book.path}) as it has no tracks")
-                    bookDao.delete(book)
+                    val emptyBookEntity = bookDao.findByLocalId(book.id)
+                    if (emptyBookEntity != null) {
+                        bookDao.delete(emptyBookEntity)
+                    }
                 }
+        sw.stop()
+        l.info("Clean-up finish (${sw.time}ms)")
+        l.info("Re-new finish (${sw.time}ms)")
     }
 
     fun categories(): List<Category> {

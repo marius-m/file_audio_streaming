@@ -1,11 +1,13 @@
 package lt.markmerkk.file_audio_streamer.controllers
 
 import lt.markmerkk.file_audio_streamer.fs.BookRepository
+import lt.markmerkk.file_audio_streamer.models.form.FormEntitySearch
 import lt.markmerkk.file_audio_streamer.models.web.NavItem
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Controller
 import org.springframework.ui.Model
+import org.springframework.web.bind.annotation.ModelAttribute
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod
@@ -22,7 +24,7 @@ class HomeController(
     fun renderCategories(
             model: Model
     ): String {
-        val navItems = listOf(NavItem.asRoot(), NavItem.asCategories().makeActive())
+        val navItems = listOf(NavItem.asRoot(), NavItem.asCategories())
         model.addAttribute("navItems", navItems)
         val categories = bookRepository
                 .categories()
@@ -37,19 +39,27 @@ class HomeController(
     )
     fun renderCategoryBooks(
             model: Model,
-            @PathVariable categoryId: String
+            @PathVariable categoryId: String,
+            @ModelAttribute formEntitySearch: FormEntitySearch
     ): String {
         val navItems = listOf(
                 NavItem.asRoot(),
                 NavItem.asCategories(),
-                NavItem.asCategoryBooks(categoryId).makeActive()
+                NavItem.asCategoryBooks(categoryId)
         )
         model.addAttribute("navItems", navItems)
         model.addAttribute("categoryId", categoryId)
-        val categoryBooks = bookRepository
-                .categoryBooks(categoryId)
-                .sortedBy { it.title }
-        model.addAttribute("books", categoryBooks)
+        val keyword = formEntitySearch.keyword
+        val books = if (keyword.isNullOrEmpty()) {
+            bookRepository
+                    .books()
+                    .sortedBy { it.title }
+        } else {
+            bookRepository
+                    .bookSearch(keyword)
+                    .sortedBy { it.title }
+        }
+        model.addAttribute("books", books)
         return "cat_books"
     }
 
@@ -58,17 +68,25 @@ class HomeController(
             method = [RequestMethod.GET]
     )
     fun renderAllBooks(
-            model: Model
+            model: Model,
+            @ModelAttribute formEntitySearch: FormEntitySearch
     ): String {
         val navItems = listOf(
                 NavItem.asRoot(),
                 NavItem.asCategories(),
-                NavItem.asBooks().makeActive()
+                NavItem.asBooks()
         )
+        val keyword = formEntitySearch.keyword
+        val books = if (keyword.isNullOrEmpty()) {
+            bookRepository
+                    .books()
+                    .sortedBy { it.title }
+        } else {
+            bookRepository
+                    .bookSearch(keyword)
+                    .sortedBy { it.title }
+        }
         model.addAttribute("navItems", navItems)
-        val books = bookRepository
-                .books()
-                .sortedBy { it.title }
         model.addAttribute("books", books)
         return "books"
     }
@@ -86,7 +104,7 @@ class HomeController(
                 NavItem.asRoot(),
                 NavItem.asCategories(),
                 NavItem.asCategoryBooks(categoryId),
-                NavItem.asBook(bookId).makeActive()
+                NavItem.asBook(bookId)
         )
         model.addAttribute("navItems", navItems)
         model.addAttribute("categoryId", categoryId)
@@ -109,7 +127,7 @@ class HomeController(
         val navItems = listOf(
                 NavItem.asRoot(),
                 NavItem.asCategories(),
-                NavItem.asBook(bookId).makeActive()
+                NavItem.asBook(bookId)
         )
         model.addAttribute("navItems", navItems)
         model.addAttribute("bookId", bookId)

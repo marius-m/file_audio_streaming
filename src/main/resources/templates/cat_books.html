@@ -7,6 +7,12 @@
 <div class="container">
     <h1 th:text="'Books for category(' + ${categoryId} + ')'"></h1>
     <th:block th:replace="fragments/frag_nav :: breadcrumb"/>
+    <form action="#" th:action="@{/categories/} + ${categoryId} + '/books'" th:object="${formEntitySearch}" method="get">
+        <div>
+            Search: <input type="text" th:field="*{keyword}"/>
+            <span><input type="submit" value="Submit"/></span>
+        </div>
+    </form>
     <div class="table-responsive">
         <table class="table table-striped">
             <thead>

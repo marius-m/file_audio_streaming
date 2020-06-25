@@ -6,4 +6,5 @@ import org.springframework.data.repository.CrudRepository
 interface BookDao : CrudRepository<BookEntity, Long> {
     fun findByLocalId(localId: String): BookEntity?
     fun findByCategoryId(categoryId: String): List<BookEntity>
+    fun findByTitleEngContains(titleEng: String): List<BookEntity>
 }

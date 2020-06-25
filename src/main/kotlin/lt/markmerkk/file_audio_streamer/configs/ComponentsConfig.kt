@@ -12,6 +12,7 @@ import lt.markmerkk.file_audio_streamer.fs.FSSource
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.context.annotation.Profile
 import org.springframework.context.annotation.PropertySource
 import org.springframework.core.env.Environment
 import org.springframework.core.io.ResourceLoader
@@ -72,8 +73,15 @@ class ComponentsConfig {
     }
 
     @Bean
-    open fun sentryClient(): SentryClient {
+    @Profile("prod")
+    open fun sentryClientProd(): SentryClient {
         return Sentry.init("https://948d91b168824f27a0490a1484b692c3@o348125.ingest.sentry.io/5289085")
+    }
+
+    @Bean
+    @Profile("dev")
+    open fun sentryClientDev(): SentryClient {
+        return Sentry.init()
     }
 
 }

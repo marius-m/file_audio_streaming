@@ -93,6 +93,11 @@ class BookRepository(
                 .map { it.toBook() }
     }
 
+    fun bookSearch(keyword: String): List<Book> {
+        return bookDao.findByTitleEngContains(keyword.toLowerCase())
+                .map { it.toBook() }
+    }
+
     @Throws(IllegalArgumentException::class)
     fun tracksForBook(bookId: String): List<Track> {
         val book = bookDao.findByLocalId(bookId) ?: throw IllegalArgumentException("No such book")

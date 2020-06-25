@@ -1,6 +1,6 @@
 package lt.markmerkk.file_audio_streamer.models.jpa
 
-import lt.markmerkk.file_audio_streamer.models.Track2
+import lt.markmerkk.file_audio_streamer.models.Track
 import javax.persistence.*
 
 @Entity(name = "track")
@@ -14,7 +14,7 @@ class TrackEntity(
         @Column val path: String
 ) {
 
-    fun toTrack(): Track2 = Track2(
+    fun toTrack(): Track = Track(
             bookId = bookId,
             id = localId,
             rawFileName = rawName,
@@ -22,7 +22,7 @@ class TrackEntity(
     )
 
     companion object {
-        fun from(track: Track2): TrackEntity {
+        fun from(track: Track): TrackEntity {
             return TrackEntity(
                     bookId = track.bookId,
                     localId = track.id,

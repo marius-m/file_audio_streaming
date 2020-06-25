@@ -3,7 +3,7 @@ package lt.markmerkk.file_audio_streamer.models
 import lt.markmerkk.file_audio_streamer.Consts
 import lt.markmerkk.file_audio_streamer.UtilsLetters
 
-data class Track2(
+data class Track(
         val bookId: String,
         val id: String,
         val rawFileName: String,

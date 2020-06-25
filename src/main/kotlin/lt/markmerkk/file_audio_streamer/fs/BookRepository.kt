@@ -4,9 +4,9 @@ import lt.markmerkk.file_audio_streamer.UUIDGen
 import lt.markmerkk.file_audio_streamer.daos.BookDao
 import lt.markmerkk.file_audio_streamer.daos.CategoryDao
 import lt.markmerkk.file_audio_streamer.daos.TrackDao
-import lt.markmerkk.file_audio_streamer.models.Book2
+import lt.markmerkk.file_audio_streamer.models.Book
 import lt.markmerkk.file_audio_streamer.models.Category
-import lt.markmerkk.file_audio_streamer.models.Track2
+import lt.markmerkk.file_audio_streamer.models.Track
 import lt.markmerkk.file_audio_streamer.models.jpa.BookEntity
 import lt.markmerkk.file_audio_streamer.models.jpa.CategoryEntity
 import lt.markmerkk.file_audio_streamer.models.jpa.TrackEntity
@@ -37,7 +37,7 @@ class BookRepository(
         categoryDao.saveAll(categoriesAsDaoObj)
         l.info("Category scan finish (${sw.time}ms)")
         l.info("Looking for books...")
-        val books: Map<String, Book2> = categories.values
+        val books: Map<String, Book> = categories.values
                 .flatMap { initBooksForCategory(it) }
                 .map { it.id to it }
                 .toMap()
@@ -46,7 +46,7 @@ class BookRepository(
         bookDao.saveAll(booksAsDaoObj)
         l.info("Book scan finish (${sw.time}ms)")
         l.info("Looking for tracks...")
-        val tracks: Map<String, Track2> = books.values
+        val tracks: Map<String, Track> = books.values
                 .flatMap { initTracksForBook(it) }
                 .map { it.id to it }
                 .toMap()
@@ -82,26 +82,26 @@ class BookRepository(
     }
 
     @Throws(IllegalArgumentException::class)
-    fun categoryBooks(categoryId: String): List<Book2> {
+    fun categoryBooks(categoryId: String): List<Book> {
         val category = categoryDao.findByLocalId(categoryId) ?: throw IllegalArgumentException("No such category")
         return bookDao.findByCategoryId(categoryId)
                 .map { it.toBook() }
     }
 
-    fun books(): List<Book2> {
+    fun books(): List<Book> {
         return bookDao.findAll()
                 .map { it.toBook() }
     }
 
     @Throws(IllegalArgumentException::class)
-    fun tracksForBook(bookId: String): List<Track2> {
+    fun tracksForBook(bookId: String): List<Track> {
         val book = bookDao.findByLocalId(bookId) ?: throw IllegalArgumentException("No such book")
         return trackDao.findByBookId(bookId)
                 .map { it.toTrack() }
     }
 
     @Throws(IllegalArgumentException::class)
-    fun track(trackId: String): Track2 {
+    fun track(trackId: String): Track {
         return trackDao.findByLocalId(trackId)?.toTrack() ?: throw IllegalArgumentException("No such track")
     }
 
@@ -135,14 +135,14 @@ class BookRepository(
         return cateogries
     }
 
-    internal fun initBooksForCategory(category: Category): List<Book2> {
+    internal fun initBooksForCategory(category: Category): List<Book> {
         l.info("Scanning books for Category(${category.title} / ${category.path})")
         val books = fsInteractor.dirsInPath(category.path)
                 .filter { it.isDirectory }
                 .map { it.absolutePath }
                 .map { pathToBook ->
                     val bookName = extractNameFromPath(pathToBook)
-                    val book = Book2(
+                    val book = Book(
                             categoryId = category.id,
                             id = uuidGen.genFrom(pathToBook),
                             title = bookName,
@@ -154,10 +154,10 @@ class BookRepository(
         return books
     }
 
-    internal fun initTracksForBook(book: Book2): List<Track2> {
+    internal fun initTracksForBook(book: Book): List<Track> {
         val tracks = fsInteractor.filesInPath(book.path)
                 .map { trackAsFile ->
-                    Track2(
+                    Track(
                             bookId = book.id,
                             id = uuidGen.genFrom(trackAsFile.absolutePath),
                             rawFileName = trackAsFile.name,

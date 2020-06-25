@@ -3,9 +3,9 @@ package lt.markmerkk.file_audio_streamer
 import com.nhaarman.mockito_kotlin.doReturn
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.whenever
-import lt.markmerkk.file_audio_streamer.models.Book2
+import lt.markmerkk.file_audio_streamer.models.Book
 import lt.markmerkk.file_audio_streamer.models.Category
-import lt.markmerkk.file_audio_streamer.models.Track2
+import lt.markmerkk.file_audio_streamer.models.Track
 import java.io.File
 
 object Mocks {
@@ -25,7 +25,7 @@ object Mocks {
             id: String = "id1",
             rawTitle: String = "book1.mp3",
             path: String = "/root/books/book1.mp3"
-    ): Track2 = Track2(
+    ): Track = Track(
             bookId = bookId,
             id = id,
             rawFileName = rawTitle,
@@ -37,7 +37,7 @@ object Mocks {
             id: String = "b_id1",
             title: String = "books",
             path: String = "/root/books"
-    ): Book2 = Book2(
+    ): Book = Book(
             categoryId = categoryId,
             id = id,
             title = title,

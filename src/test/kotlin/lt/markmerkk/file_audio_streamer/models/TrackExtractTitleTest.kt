@@ -4,7 +4,7 @@ import lt.markmerkk.file_audio_streamer.Mocks
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
 
-class Track2ExtractTitleTest {
+class TrackExtractTitleTest {
 
     @Test
     fun extractMp3_1() {

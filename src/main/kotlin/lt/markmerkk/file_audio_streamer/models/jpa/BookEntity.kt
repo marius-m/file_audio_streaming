@@ -1,6 +1,6 @@
 package lt.markmerkk.file_audio_streamer.models.jpa
 
-import lt.markmerkk.file_audio_streamer.models.Book2
+import lt.markmerkk.file_audio_streamer.models.Book
 import javax.persistence.*
 
 @Entity(name = "book")
@@ -13,7 +13,7 @@ class BookEntity(
         @Column val path: String
 ) {
 
-    fun toBook(): Book2 = Book2(
+    fun toBook(): Book = Book(
             categoryId = categoryId,
             id = localId,
             title = title,
@@ -21,7 +21,7 @@ class BookEntity(
     )
 
     companion object {
-        fun from(book: Book2): BookEntity {
+        fun from(book: Book): BookEntity {
             return BookEntity(
                     categoryId = book.categoryId,
                     localId = book.id,

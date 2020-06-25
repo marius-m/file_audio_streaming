@@ -4,7 +4,7 @@ import lt.markmerkk.file_audio_streamer.Mocks
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
 
-class Track2IsSupportedTest {
+class TrackIsSupportedTest {
 
     @Test
     fun supportedType() {

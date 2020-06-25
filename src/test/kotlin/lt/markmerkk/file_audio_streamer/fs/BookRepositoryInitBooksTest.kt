@@ -8,7 +8,6 @@ import lt.markmerkk.file_audio_streamer.UUIDGen
 import lt.markmerkk.file_audio_streamer.daos.BookDao
 import lt.markmerkk.file_audio_streamer.daos.CategoryDao
 import lt.markmerkk.file_audio_streamer.daos.TrackDao
-import lt.markmerkk.file_audio_streamer.models.Book2
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
 import org.junit.Test

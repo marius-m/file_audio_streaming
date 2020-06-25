@@ -26,7 +26,7 @@ class HomeController(
         model.addAttribute("navItems", navItems)
         val categories = bookRepository
                 .categories()
-                .sortedByDescending { it.title }
+                .sortedBy { it.title }
         model.addAttribute("categories", categories)
         return "categories"
     }
@@ -48,7 +48,7 @@ class HomeController(
         model.addAttribute("categoryId", categoryId)
         val categoryBooks = bookRepository
                 .categoryBooks(categoryId)
-                .sortedByDescending { it.title }
+                .sortedBy { it.title }
         model.addAttribute("books", categoryBooks)
         return "cat_books"
     }
@@ -68,7 +68,7 @@ class HomeController(
         model.addAttribute("navItems", navItems)
         val books = bookRepository
                 .books()
-                .sortedByDescending { it.title }
+                .sortedBy { it.title }
         model.addAttribute("books", books)
         return "books"
     }
@@ -93,7 +93,7 @@ class HomeController(
         model.addAttribute("bookId", bookId)
         val tracksForBook = bookRepository
                 .tracksForBook(bookId)
-                .sortedByDescending { it.title }
+                .sortedBy { it.title }
         model.addAttribute("tracks", tracksForBook)
         return "tracks"
     }

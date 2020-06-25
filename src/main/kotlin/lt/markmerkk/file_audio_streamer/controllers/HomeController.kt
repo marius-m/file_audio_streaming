@@ -99,6 +99,28 @@ class HomeController(
     }
 
     @RequestMapping(
+            value = ["/books/{bookId}"],
+            method = [RequestMethod.GET]
+    )
+    fun renderTracksForBook(
+            model: Model,
+            @PathVariable bookId: String
+    ): String {
+        val navItems = listOf(
+                NavItem.asRoot(),
+                NavItem.asCategories(),
+                NavItem.asBook(bookId).makeActive()
+        )
+        model.addAttribute("navItems", navItems)
+        model.addAttribute("bookId", bookId)
+        val tracksForBook = bookRepository
+                .tracksForBook(bookId)
+                .sortedBy { it.title }
+        model.addAttribute("tracks", tracksForBook)
+        return "tracks"
+    }
+
+    @RequestMapping(
             value = ["/","/index"],
             method = [RequestMethod.GET]
     )

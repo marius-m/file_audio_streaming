@@ -42,3 +42,4 @@ atlassian-ide-plugin.xml
 # Project
 books/
 src/main/resources/creds.properties
+logs/

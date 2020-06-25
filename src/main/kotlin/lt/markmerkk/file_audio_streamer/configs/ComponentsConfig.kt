@@ -1,5 +1,7 @@
 package lt.markmerkk.file_audio_streamer.configs
 
+import io.sentry.Sentry
+import io.sentry.SentryClient
 import lt.markmerkk.file_audio_streamer.UUIDGen
 import lt.markmerkk.file_audio_streamer.daos.BookDao
 import lt.markmerkk.file_audio_streamer.daos.CategoryDao
@@ -67,6 +69,11 @@ class ComponentsConfig {
                 bookDao,
                 trackDao
         ).apply { renewCache() }
+    }
+
+    @Bean
+    open fun sentryClient(): SentryClient {
+        return Sentry.init("https://948d91b168824f27a0490a1484b692c3@o348125.ingest.sentry.io/5289085")
     }
 
 }

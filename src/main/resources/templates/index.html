@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="fragments/frag_res :: css"/>
+</head>
+<body>
+<div class="container">
+    <h1>Book streamer</h1>
+    <th:block th:replace="fragments/frag_nav :: breadcrumb"/>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th scope="col">Title</th>
+                <th scope="col">Count</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <th scope="row">Categories</th>
+                <td>
+                    <a th:href="@{/categories}">
+                        <span th:text="${categoryCount}"></span>
+                    </a>
+                </td>
+            </tr>
+            <tr>
+                <th scope="row">Books</th>
+                <td>
+                    <a th:href="@{/books}">
+                        <span th:text="${bookCount}"></span>
+                    </a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+    <form action="/re-index" method="GET">
+        <input type="submit" value="Re-index FS">
+    </form>
+</div>
+
+<th:block th:replace="fragments/frag_res :: js"/>
+</body>
+</html>

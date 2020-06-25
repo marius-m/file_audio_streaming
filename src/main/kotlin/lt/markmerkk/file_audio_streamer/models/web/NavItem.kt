@@ -9,7 +9,8 @@ data class NavItem(
     fun makeActive(): NavItem = NavItem(title = title, path = path, active = true)
 
     companion object {
-        fun asRoot(): NavItem = NavItem(title = "Categories", path = "/")
+        fun asRoot(): NavItem = NavItem(title = "Home", path = "/")
+        fun asCategories(): NavItem = NavItem(title = "Categories", path = "/categories")
         fun asCategoryBooks(categoryId: String): NavItem = NavItem(title = "Books", path = "/categories/$categoryId/books")
         fun asBooks(): NavItem = NavItem(title = "Books", path = "/books")
         fun asBook(bookId: String): NavItem = NavItem(title = "Book", path = "/books/$bookId")

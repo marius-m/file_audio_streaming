@@ -10,6 +10,7 @@ import lt.markmerkk.file_audio_streamer.models.Track2
 import lt.markmerkk.file_audio_streamer.models.jpa.BookEntity
 import lt.markmerkk.file_audio_streamer.models.jpa.CategoryEntity
 import lt.markmerkk.file_audio_streamer.models.jpa.TrackEntity
+import org.slf4j.LoggerFactory
 
 class BookRepository(
         private val fsInteractor: FSInteractor,
@@ -21,29 +22,43 @@ class BookRepository(
 ) {
 
     fun renewCache() {
+        l.info("Renewing cache")
         categoryDao.deleteAll()
         bookDao.deleteAll()
         trackDao.deleteAll()
+        l.info("Looking for categories...")
         val categories = initCategories(rootPathsWithDelimiter = fsSource.rootPathsWithDelimiter)
                 .map { it.id to it }
                 .toMap()
         val categoriesAsDaoObj = categories.values
                 .map { CategoryEntity.from(it) }
         categoryDao.saveAll(categoriesAsDaoObj)
-        val books = categories.values
+        l.info("Looking for books...")
+        val books: Map<String, Book2> = categories.values
                 .flatMap { initBooksForCategory(it) }
                 .map { it.id to it }
                 .toMap()
         val booksAsDaoObj = books.values
                 .map { BookEntity.from(it) }
         bookDao.saveAll(booksAsDaoObj)
-        val tracks = books.values
+        l.info("Looking for tracks...")
+        val tracks: Map<String, Track2> = books.values
                 .flatMap { initTracksForBook(it) }
                 .map { it.id to it }
                 .toMap()
         val tracksAsDaoObj = tracks.values
                 .map { TrackEntity.from(it) }
         trackDao.saveAll(tracksAsDaoObj)
+        l.info("Removing books with empty tracks...")
+        val emptyBooks = bookDao.findAll()
+                .filter {
+                    trackDao.findByBookId(it.localId)
+                            .count() == 0
+                }
+        emptyBooks.forEach { book ->
+                    l.info("Rm Book (${book.id} / ${book.title} / ${book.path}) as it has no tracks")
+                    bookDao.delete(book)
+                }
     }
 
     fun categories(): List<Category> {
@@ -86,32 +101,43 @@ class BookRepository(
         }
         val rootPaths = rootPathsWithDelimiter
                 .split(",")
-        return rootPaths
-                .flatMap { fsInteractor.dirsInPath(it) }
+        l.info("Scanning for categories")
+        val cateogries = rootPaths
+                .flatMap {
+                    l.info("Scanning categories in $it")
+                    fsInteractor.dirsInPath(it)
+                }
                 .map { it.absolutePath }
                 .map { pathToCategory ->
                     val catName = extractNameFromPath(pathToCategory)
-                    Category(id = uuidGen.genFrom(pathToCategory), title = catName, path = pathToCategory)
+                    val cat = Category(id = uuidGen.genFrom(pathToCategory), title = catName, path = pathToCategory)
+                    l.info("Found category $cat")
+                    cat
                 }
+        return cateogries
     }
 
     internal fun initBooksForCategory(category: Category): List<Book2> {
-        return fsInteractor.dirsInPath(category.path)
+        l.info("Scanning books for Category(${category.title} / ${category.path})")
+        val books = fsInteractor.dirsInPath(category.path)
                 .filter { it.isDirectory }
                 .map { it.absolutePath }
                 .map { pathToBook ->
                     val bookName = extractNameFromPath(pathToBook)
-                    Book2(
+                    val book = Book2(
                             categoryId = category.id,
                             id = uuidGen.genFrom(pathToBook),
                             title = bookName,
                             path = pathToBook
                     )
+                    l.info("Found Book(${book.id} / ${book.title} / ${book.path})")
+                    book
                 }
+        return books
     }
 
     internal fun initTracksForBook(book: Book2): List<Track2> {
-        return fsInteractor.filesInPath(book.path)
+        val tracks = fsInteractor.filesInPath(book.path)
                 .map { trackAsFile ->
                     Track2(
                             bookId = book.id,
@@ -121,11 +147,14 @@ class BookRepository(
                     )
                 }
                 .filter { it.isSupported() }
+        l.info("Found ${tracks.size} tracks for Book(${book.id} / ${book.title} / ${book.path})")
+        return tracks
     }
 
     //endregion
 
     companion object {
+        private val l = LoggerFactory.getLogger(BookRepository::class.java)!!
         fun extractNameFromPath(path: String): String {
             return path.split("/").last()
         }

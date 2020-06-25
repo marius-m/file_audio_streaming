@@ -9,6 +9,7 @@ class BookEntity(
         @Column val categoryId: String,
         @Column(unique = true) val localId: String,
         @Column val title: String,
+        @Column val titleEng: String,
         @Column val path: String
 ) {
 
@@ -25,6 +26,7 @@ class BookEntity(
                     categoryId = book.categoryId,
                     localId = book.id,
                     title = book.title,
+                    titleEng = book.titleEng,
                     path = book.path
             )
         }

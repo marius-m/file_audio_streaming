@@ -1,5 +1,6 @@
 package lt.markmerkk.file_audio_streamer.configs
 
+import lt.markmerkk.file_audio_streamer.controllers.HomeController
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
@@ -15,30 +16,22 @@ import org.springframework.security.crypto.password.PasswordEncoder
 
 @Configuration
 @EnableWebSecurity
-@Profile("prod")
-class SecurityConfigProd : WebSecurityConfigurerAdapter() {
+@Profile("dev")
+class SecurityConfigDev : WebSecurityConfigurerAdapter() {
 
     @Autowired
     lateinit var credentials: Credentials
 
     override fun configure(auth: AuthenticationManagerBuilder) {
-        l.info("Using PROD security")
-        if (!credentials.isEmpty()) {
-            auth.inMemoryAuthentication()
-                    .withUser(credentials.username)
-                    .password(passwordEncoder().encode(credentials.password))
-                    .roles("USER")
-        }
+        l.info("Using DEV security")
     }
 
-    override fun configure(httpSec: HttpSecurity) {
-        if (!credentials.isEmpty()) {
-            httpSec.authorizeRequests()
-                    .anyRequest()
-                    .authenticated()
-                    .and()
-                    .httpBasic()
-        }
+    override fun configure(httpSecurity: HttpSecurity) {
+        httpSecurity.authorizeRequests().antMatchers("/").permitAll()
+                .and()
+                .authorizeRequests().antMatchers("/console/**").permitAll()
+        httpSecurity.csrf().disable()
+        httpSecurity.headers().frameOptions().disable()
     }
 
     @Bean

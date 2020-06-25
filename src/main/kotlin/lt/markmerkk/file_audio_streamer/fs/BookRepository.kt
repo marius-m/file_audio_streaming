@@ -124,7 +124,11 @@ class BookRepository(
                 .map { it.absolutePath }
                 .map { pathToCategory ->
                     val catName = extractNameFromPath(pathToCategory)
-                    val cat = Category(id = uuidGen.genFrom(pathToCategory), title = catName, path = pathToCategory)
+                    val cat = Category(
+                            id = uuidGen.genFrom(pathToCategory),
+                            title = catName,
+                            path = pathToCategory
+                    )
                     l.info("Found category $cat")
                     cat
                 }

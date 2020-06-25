@@ -1,6 +1,7 @@
 package lt.markmerkk.file_audio_streamer.models
 
 import lt.markmerkk.file_audio_streamer.Consts
+import lt.markmerkk.file_audio_streamer.UtilsLetters
 
 data class Track2(
         val bookId: String,
@@ -10,6 +11,8 @@ data class Track2(
 ) {
 
     val title = extractTitle()
+
+    val titleEng: String = UtilsLetters.transliterateLowercase(title)
 
     /**
      * Check if track is of supported type

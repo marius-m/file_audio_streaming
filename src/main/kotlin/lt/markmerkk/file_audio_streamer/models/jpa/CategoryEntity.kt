@@ -8,6 +8,7 @@ class CategoryEntity(
         @Id @GeneratedValue(strategy = GenerationType.AUTO) val id: Long = 0,
         @Column(unique = true) val localId: String,
         @Column val title: String,
+        @Column val titleEng: String,
         @Column val path: String
 ) {
 
@@ -22,6 +23,7 @@ class CategoryEntity(
             return CategoryEntity(
                     localId = category.id,
                     title = category.title,
+                    titleEng = category.titleEng,
                     path = category.path
             )
         }

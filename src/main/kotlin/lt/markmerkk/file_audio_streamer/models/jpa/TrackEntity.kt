@@ -9,6 +9,8 @@ class TrackEntity(
         @Column val bookId: String,
         @Column(unique = true) val localId: String,
         @Column val rawName: String,
+        @Column val title: String,
+        @Column val titleEng: String,
         @Column val path: String
 ) {
 
@@ -25,6 +27,8 @@ class TrackEntity(
                     bookId = track.bookId,
                     localId = track.id,
                     rawName = track.rawFileName,
+                    title = track.title,
+                    titleEng = track.titleEng,
                     path = track.path
             )
         }

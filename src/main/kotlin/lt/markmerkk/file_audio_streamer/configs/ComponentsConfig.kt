@@ -19,7 +19,6 @@ import org.springframework.context.annotation.Scope
 import org.springframework.core.env.Environment
 import org.springframework.core.io.ResourceLoader
 
-
 @Configuration
 @PropertySource("classpath:creds.properties", ignoreResourceNotFound = true)
 class ComponentsConfig {
@@ -27,12 +26,9 @@ class ComponentsConfig {
     @Bean
     @Scope("singleton")
     open fun provideBuildConfig(
-        @Value("\${version}") version: String,
-        @Value("\${dockerHost}") dockerHost: String,
         @Value("#{servletContext.contextPath}") contextPath: String
     ): BuildConfig {
         val buildConfig = BuildConfig(
-            version = version,
             contextPath = contextPath
         )
         return buildConfig
@@ -41,7 +37,7 @@ class ComponentsConfig {
     @Bean
     @Scope("singleton")
     open fun provideUUID(
-            env: Environment
+        env: Environment
     ): UUIDGen {
         return UUIDGen()
     }
@@ -49,18 +45,18 @@ class ComponentsConfig {
     @Bean
     @Scope("singleton")
     open fun provideCredentials(
-            env: Environment
+        env: Environment
     ): Credentials {
         return Credentials(
-                env.getProperty("basic_username"),
-                env.getProperty("basic_password")
+            env.getProperty("basic_username"),
+            env.getProperty("basic_password")
         )
     }
 
     @Bean
     @Scope("singleton")
     open fun provideFsConfig(
-            @Value("\${rootPaths}") rootPaths: String
+        @Value("\${rootPaths}") rootPaths: String
     ): FSSource {
         return FSSource(rootPaths)
     }
@@ -68,7 +64,7 @@ class ComponentsConfig {
     @Bean
     @Scope("singleton")
     open fun fsInteractor(
-            resourceLoader: ResourceLoader
+        resourceLoader: ResourceLoader
     ): FSInteractor {
         return FSInteractor(resourceLoader)
     }
@@ -76,20 +72,20 @@ class ComponentsConfig {
     @Bean
     @Scope("singleton")
     open fun bookRepository(
-            fsInteractor: FSInteractor,
-            fsSource: FSSource,
-            uuidGen: UUIDGen,
-            categoryDao: CategoryDao,
-            bookDao: BookDao,
-            trackDao: TrackDao
+        fsInteractor: FSInteractor,
+        fsSource: FSSource,
+        uuidGen: UUIDGen,
+        categoryDao: CategoryDao,
+        bookDao: BookDao,
+        trackDao: TrackDao
     ): BookRepository {
         return BookRepository(
-                fsInteractor,
-                fsSource,
-                uuidGen,
-                categoryDao,
-                bookDao,
-                trackDao
+            fsInteractor,
+            fsSource,
+            uuidGen,
+            categoryDao,
+            bookDao,
+            trackDao
         ).apply { renewCache() }
     }
 
@@ -106,5 +102,4 @@ class ComponentsConfig {
     open fun sentryClientDev(): SentryClient {
         return Sentry.init()
     }
-
 }

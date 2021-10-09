@@ -1,5 +1,6 @@
 package lt.markmerkk.file_audio_streamer.controllers
 
+import lt.markmerkk.file_audio_streamer.BuildConfig
 import lt.markmerkk.file_audio_streamer.fs.BookRepository
 import lt.markmerkk.file_audio_streamer.models.form.FormEntitySearch
 import lt.markmerkk.file_audio_streamer.models.web.NavItem
@@ -14,7 +15,8 @@ import org.springframework.web.bind.annotation.RequestMethod
 
 @Controller
 class HomeController(
-        @Autowired val bookRepository: BookRepository
+    @Autowired val bookRepository: BookRepository,
+    @Autowired val bc: BuildConfig
 ) {
 
     @RequestMapping(
@@ -24,7 +26,7 @@ class HomeController(
     fun renderCategories(
             model: Model
     ): String {
-        val navItems = listOf(NavItem.asRoot(), NavItem.asCategories())
+        val navItems = listOf(NavItem.asRoot(bc), NavItem.asCategories(bc))
         model.addAttribute("navItems", navItems)
         val categories = bookRepository
                 .categories()
@@ -43,9 +45,9 @@ class HomeController(
             @ModelAttribute formEntitySearch: FormEntitySearch
     ): String {
         val navItems = listOf(
-                NavItem.asRoot(),
-                NavItem.asCategories(),
-                NavItem.asCategoryBooks(categoryId)
+                NavItem.asRoot(bc),
+                NavItem.asCategories(bc),
+                NavItem.asCategoryBooks(bc, categoryId)
         )
         model.addAttribute("navItems", navItems)
         model.addAttribute("categoryId", categoryId)
@@ -72,9 +74,9 @@ class HomeController(
             @ModelAttribute formEntitySearch: FormEntitySearch
     ): String {
         val navItems = listOf(
-                NavItem.asRoot(),
-                NavItem.asCategories(),
-                NavItem.asBooks()
+                NavItem.asRoot(bc),
+                NavItem.asCategories(bc),
+                NavItem.asBooks(bc)
         )
         val keyword = formEntitySearch.keyword
         val books = if (keyword.isNullOrEmpty()) {
@@ -101,10 +103,10 @@ class HomeController(
             @PathVariable bookId: String
     ): String {
         val navItems = listOf(
-                NavItem.asRoot(),
-                NavItem.asCategories(),
-                NavItem.asCategoryBooks(categoryId),
-                NavItem.asBook(bookId)
+                NavItem.asRoot(bc),
+                NavItem.asCategories(bc),
+                NavItem.asCategoryBooks(bc, categoryId),
+                NavItem.asBook(bc, bookId)
         )
         model.addAttribute("navItems", navItems)
         model.addAttribute("categoryId", categoryId)
@@ -125,9 +127,9 @@ class HomeController(
             @PathVariable bookId: String
     ): String {
         val navItems = listOf(
-                NavItem.asRoot(),
-                NavItem.asCategories(),
-                NavItem.asBook(bookId)
+                NavItem.asRoot(bc),
+                NavItem.asCategories(bc),
+                NavItem.asBook(bc, bookId)
         )
         model.addAttribute("navItems", navItems)
         model.addAttribute("bookId", bookId)
@@ -145,7 +147,7 @@ class HomeController(
     fun renderIndex(
             model: Model
     ): String {
-        val navItems = listOf(NavItem.asRoot(), NavItem.asCategories())
+        val navItems = listOf(NavItem.asRoot(bc), NavItem.asCategories(bc))
         model.addAttribute("navItems", navItems)
         model.addAttribute("categoryCount", bookRepository.categories().size)
         model.addAttribute("bookCount", bookRepository.books().size)

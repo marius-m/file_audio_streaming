@@ -5,13 +5,8 @@ data class BuildConfig private constructor(
 ) {
     companion object {
         fun build(contextPath: String): BuildConfig {
-            val ctxPath = if (contextPath.isEmpty()) {
-                "/"
-            } else {
-                contextPath
-            }
             return BuildConfig(
-                contextPath = ctxPath
+                contextPath = contextPath
             )
         }
     }

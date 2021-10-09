@@ -28,7 +28,7 @@ class ComponentsConfig {
     open fun provideBuildConfig(
         @Value("#{servletContext.contextPath}") contextPath: String
     ): BuildConfig {
-        val buildConfig = BuildConfig(
+        val buildConfig = BuildConfig.build(
             contextPath = contextPath
         )
         return buildConfig

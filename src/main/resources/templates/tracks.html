@@ -7,6 +7,9 @@
 <div class="container">
     <h1 th:text="'Tracks for book (' + ${bookId} + ')'"></h1>
     <th:block th:replace="fragments/frag_nav :: breadcrumb"/>
+    <th:block th:if="${indexStatus.isRunning}">
+        <p th:text="${indexStatus.statusMessage}"></p>
+    </th:block>
     <div class="table-responsive">
         <table class="table table-striped">
             <thead>

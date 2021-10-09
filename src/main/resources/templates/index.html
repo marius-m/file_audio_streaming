@@ -10,6 +10,14 @@
 <div class="container">
     <h1>Book streamer</h1>
     <th:block th:replace="fragments/frag_nav :: breadcrumb"/>
+    <th:block th:if="${!indexStatus.isRunning}">
+        <form th:action="@{/re-index}" method="GET">
+            <input type="submit" value="Re-index FS">
+        </form>
+    </th:block>
+    <th:block th:if="${indexStatus.isRunning}">
+        <p th:text="${indexStatus.statusMessage}"></p>
+    </th:block>
     <div class="table-responsive">
         <table class="table table-striped">
             <thead>
@@ -38,14 +46,6 @@
             </tbody>
         </table>
     </div>
-    <th:block th:if="${!indexStatus.isRunning}">
-        <form th:action="@{/re-index}" method="GET">
-            <input type="submit" value="Re-index FS">
-        </form>
-    </th:block>
-    <th:block th:if="${indexStatus.isRunning}">
-        <p th:text="${indexStatus.statusMessage}"></p>
-    </th:block>
 </div>
 
 <th:block th:replace="fragments/frag_res :: js"/>

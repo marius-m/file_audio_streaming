@@ -2,15 +2,15 @@ package lt.markmerkk.file_audio_streamer.fs
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import lt.markmerkk.file_audio_streamer.UUIDGen
 import lt.markmerkk.file_audio_streamer.daos.BookDao
 import lt.markmerkk.file_audio_streamer.daos.CategoryDao
 import lt.markmerkk.file_audio_streamer.daos.TrackDao
+import lt.markmerkk.file_audio_streamer.fs.entities.IndexStats
+import lt.markmerkk.file_audio_streamer.fs.entities.IndexStatus
 import lt.markmerkk.file_audio_streamer.models.Book
 import lt.markmerkk.file_audio_streamer.models.Category
 import lt.markmerkk.file_audio_streamer.models.Track
@@ -37,6 +37,7 @@ class FileIndexer(
     private var sw = StopWatch()
     private val isRunning = AtomicBoolean(false)
     private var scopeIo = CoroutineScope(Dispatchers.IO)
+    private var indexStats = IndexStats.asEmpty()
 
     fun renewIndex() {
         if (isRunning.get()) {
@@ -60,7 +61,11 @@ class FileIndexer(
         }
     }
 
-    fun indexStatus() = IndexStatus.build(isRunning.get(), sw)
+    fun indexStatus() = IndexStatus.build(
+        indexStats,
+        isRunning.get(),
+        sw,
+    )
 
     @PreDestroy
     fun destroy() {
@@ -68,6 +73,7 @@ class FileIndexer(
     }
 
     private suspend fun internalRenewCache(sw: StopWatch) {
+        indexStats = IndexStats.asEmpty()
         categoryDao.deleteAll()
         bookDao.deleteAll()
         trackDao.deleteAll()
@@ -80,6 +86,9 @@ class FileIndexer(
         categoryDao.saveAll(categoriesAsDaoObj)
         l.info("Category scan finish (${sw.time}ms)")
         l.info("Looking for books...")
+        indexStats = IndexStats.withCats(
+            categoryCount = categories.size
+        )
         val books: Map<String, Book> = categories.values
             .flatMap { initBooksForCategory(it) }
             .map { it.id to it }
@@ -89,6 +98,10 @@ class FileIndexer(
         bookDao.saveAll(booksAsDaoObj)
         l.info("Book scan finish (${sw.time}ms)")
         l.info("Looking for tracks...")
+        indexStats = IndexStats.withCatsBooks(
+            categoryCount = categories.size,
+            bookCount = books.size,
+        )
         val tracks: Map<String, Track> = books.values
             .flatMap { initTracksForBook(it) }
             .map { it.id to it }
@@ -97,6 +110,11 @@ class FileIndexer(
             .map { TrackEntity.from(it) }
         trackDao.saveAll(tracksAsDaoObj)
         l.info("Track scan finish (${sw.time}ms)")
+        indexStats = IndexStats.withCatsBooksTracks(
+            categoryCount = categories.size,
+            bookCount = books.size,
+            trackCount = tracks.size,
+        )
         l.info("Removing books with empty tracks...")
         val emptyBooks = books.values
             .filter { book ->
@@ -113,6 +131,12 @@ class FileIndexer(
                     bookDao.delete(emptyBookEntity)
                 }
             }
+        indexStats = IndexStats.withCatsBooksTracksEB(
+            categoryCount = categories.size,
+            bookCount = books.size,
+            trackCount = tracks.size,
+            emptyBookCount = emptyBooks.size,
+        )
     }
 
     internal fun initCategories(
@@ -175,28 +199,6 @@ class FileIndexer(
             .filter { it.isSupported() }
         l.info("Found ${tracks.size} tracks for Book(${book.id} / ${book.title} / ${book.path})")
         return tracks
-    }
-
-    data class IndexStatus(
-        val isRunning: Boolean,
-        val statusMessage: String,
-    ) {
-        companion object {
-            fun build(
-                isRunning: Boolean,
-                sw: StopWatch,
-            ): IndexStatus {
-                val statusMessage = if (isRunning) {
-                    "Indexing audio file system (${sw.time}ms)"
-                } else {
-                    ""
-                }
-                return IndexStatus(
-                    isRunning = isRunning,
-                    statusMessage = statusMessage,
-                )
-            }
-        }
     }
 
     companion object {

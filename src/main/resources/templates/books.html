@@ -7,6 +7,9 @@
 <div class="container">
     <h1>Books</h1>
     <th:block th:replace="fragments/frag_nav :: breadcrumb"/>
+    <th:block th:if="${indexStatus.isRunning}">
+        <p th:text="${indexStatus.statusMessage}"></p>
+    </th:block>
     <form action="#" th:action="@{/books}" th:object="${formEntitySearch}" method="get">
         <div>
             Search: <input type="text" th:field="*{keyword}"/>

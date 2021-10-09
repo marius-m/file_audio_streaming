@@ -1,6 +1,8 @@
 package lt.markmerkk.file_audio_streamer.controllers
 
+import lt.markmerkk.file_audio_streamer.BuildConfig
 import lt.markmerkk.file_audio_streamer.fs.BookRepository
+import lt.markmerkk.file_audio_streamer.fs.FileIndexer
 import lt.markmerkk.file_audio_streamer.models.form.FormEntitySearch
 import lt.markmerkk.file_audio_streamer.models.web.NavItem
 import org.slf4j.LoggerFactory
@@ -14,7 +16,9 @@ import org.springframework.web.bind.annotation.RequestMethod
 
 @Controller
 class HomeController(
-        @Autowired val bookRepository: BookRepository
+    @Autowired val bookRepository: BookRepository,
+    @Autowired val bc: BuildConfig,
+    @Autowired val fileIndexer: FileIndexer,
 ) {
 
     @RequestMapping(
@@ -24,12 +28,13 @@ class HomeController(
     fun renderCategories(
             model: Model
     ): String {
-        val navItems = listOf(NavItem.asRoot(), NavItem.asCategories())
+        val navItems = listOf(NavItem.asRoot(bc), NavItem.asCategories(bc))
         model.addAttribute("navItems", navItems)
         val categories = bookRepository
                 .categories()
                 .sortedBy { it.title }
         model.addAttribute("categories", categories)
+        model.addAttribute("indexStatus", fileIndexer.indexStatus())
         return "categories"
     }
 
@@ -43,9 +48,9 @@ class HomeController(
             @ModelAttribute formEntitySearch: FormEntitySearch
     ): String {
         val navItems = listOf(
-                NavItem.asRoot(),
-                NavItem.asCategories(),
-                NavItem.asCategoryBooks(categoryId)
+                NavItem.asRoot(bc),
+                NavItem.asCategories(bc),
+                NavItem.asCategoryBooks(bc, categoryId)
         )
         model.addAttribute("navItems", navItems)
         model.addAttribute("categoryId", categoryId)
@@ -60,6 +65,7 @@ class HomeController(
                     .sortedBy { it.title }
         }
         model.addAttribute("books", books)
+        model.addAttribute("indexStatus", fileIndexer.indexStatus())
         return "cat_books"
     }
 
@@ -72,9 +78,9 @@ class HomeController(
             @ModelAttribute formEntitySearch: FormEntitySearch
     ): String {
         val navItems = listOf(
-                NavItem.asRoot(),
-                NavItem.asCategories(),
-                NavItem.asBooks()
+                NavItem.asRoot(bc),
+                NavItem.asCategories(bc),
+                NavItem.asBooks(bc)
         )
         val keyword = formEntitySearch.keyword
         val books = if (keyword.isNullOrEmpty()) {
@@ -88,6 +94,7 @@ class HomeController(
         }
         model.addAttribute("navItems", navItems)
         model.addAttribute("books", books)
+        model.addAttribute("indexStatus", fileIndexer.indexStatus())
         return "books"
     }
 
@@ -101,10 +108,10 @@ class HomeController(
             @PathVariable bookId: String
     ): String {
         val navItems = listOf(
-                NavItem.asRoot(),
-                NavItem.asCategories(),
-                NavItem.asCategoryBooks(categoryId),
-                NavItem.asBook(bookId)
+                NavItem.asRoot(bc),
+                NavItem.asCategories(bc),
+                NavItem.asCategoryBooks(bc, categoryId),
+                NavItem.asBook(bc, bookId)
         )
         model.addAttribute("navItems", navItems)
         model.addAttribute("categoryId", categoryId)
@@ -113,6 +120,7 @@ class HomeController(
                 .tracksForBook(bookId)
                 .sortedBy { it.title }
         model.addAttribute("tracks", tracksForBook)
+        model.addAttribute("indexStatus", fileIndexer.indexStatus())
         return "tracks"
     }
 
@@ -125,9 +133,9 @@ class HomeController(
             @PathVariable bookId: String
     ): String {
         val navItems = listOf(
-                NavItem.asRoot(),
-                NavItem.asCategories(),
-                NavItem.asBook(bookId)
+                NavItem.asRoot(bc),
+                NavItem.asCategories(bc),
+                NavItem.asBook(bc, bookId)
         )
         model.addAttribute("navItems", navItems)
         model.addAttribute("bookId", bookId)
@@ -135,6 +143,7 @@ class HomeController(
                 .tracksForBook(bookId)
                 .sortedBy { it.title }
         model.addAttribute("tracks", tracksForBook)
+        model.addAttribute("indexStatus", fileIndexer.indexStatus())
         return "tracks"
     }
 
@@ -145,10 +154,11 @@ class HomeController(
     fun renderIndex(
             model: Model
     ): String {
-        val navItems = listOf(NavItem.asRoot(), NavItem.asCategories())
+        val navItems = listOf(NavItem.asRoot(bc), NavItem.asCategories(bc))
         model.addAttribute("navItems", navItems)
         model.addAttribute("categoryCount", bookRepository.categories().size)
         model.addAttribute("bookCount", bookRepository.books().size)
+        model.addAttribute("indexStatus", fileIndexer.indexStatus())
         return "index"
     }
 
@@ -160,9 +170,8 @@ class HomeController(
             model: Model
     ): String {
         l.info("Re-indexing folders...")
-        bookRepository.renewCache()
-        l.info("File index complete!")
-        return "redirect:/index"
+        fileIndexer.renewIndex()
+        return "redirect:/"
     }
 
     companion object {

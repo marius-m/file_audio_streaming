@@ -14,7 +14,7 @@ import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 
-class BookRepositoryInitBooksTest {
+class FileIndexerInitBooksTest {
 
     @Mock lateinit var fsInteractor: FSInteractor
     @Mock lateinit var fsSource: FSSource
@@ -22,18 +22,19 @@ class BookRepositoryInitBooksTest {
     @Mock lateinit var categoryDao: CategoryDao
     @Mock lateinit var booksDao: BookDao
     @Mock lateinit var tracksDao: TrackDao
-    lateinit var bookRepository: BookRepository
+
+    private lateinit var fileIndexer: FileIndexer
 
     @Before
     fun setUp() {
         MockitoAnnotations.initMocks(this)
-        bookRepository = BookRepository(
-                fsInteractor = fsInteractor,
-                fsSource = fsSource,
-                uuidGen = uuidGen,
-                categoryDao = categoryDao,
-                bookDao = booksDao,
-                trackDao = tracksDao
+        fileIndexer = FileIndexer(
+            fsInteractor = fsInteractor,
+            fsSource = fsSource,
+            uuidGen = uuidGen,
+            categoryDao = categoryDao,
+            bookDao = booksDao,
+            trackDao = tracksDao
         )
     }
 
@@ -41,16 +42,16 @@ class BookRepositoryInitBooksTest {
     fun validBooks() {
         // Assemble
         val category1 = Mocks.createCategory(
-                id = "c_id1",
-                path = "/root/books"
+            id = "c_id1",
+            path = "/root/books"
         )
         doReturn("b_id1").whenever(uuidGen).genFrom(any())
         val bookPath1 = Mocks.mockFile(isDirectory = true, absolutePath = "/root/books/book1")
         doReturn(listOf(bookPath1))
-                .whenever(fsInteractor).dirsInPath("/root/books")
+            .whenever(fsInteractor).dirsInPath("/root/books")
 
         // Act
-        val result = bookRepository.initBooksForCategory(category1)
+        val result = fileIndexer.initBooksForCategory(category1)
 
         // Assert
         val book1 = result[0]
@@ -64,19 +65,18 @@ class BookRepositoryInitBooksTest {
     fun fileInDirectory() {
         // Assemble
         val category1 = Mocks.createCategory(
-                id = "c_id1",
-                path = "/root/books"
+            id = "c_id1",
+            path = "/root/books"
         )
         doReturn("b_id1").whenever(uuidGen).genFrom(any())
         val bookPath1 = Mocks.mockFile(isDirectory = false, absolutePath = "/root/books/book1.mp3")
         doReturn(listOf(bookPath1))
-                .whenever(fsInteractor).dirsInPath("/root/books") // should not happen
+            .whenever(fsInteractor).dirsInPath("/root/books") // should not happen
 
         // Act
-        val result = bookRepository.initBooksForCategory(category1)
+        val result = fileIndexer.initBooksForCategory(category1)
 
         // Assert
         assertThat(result).isEmpty()
     }
-
 }

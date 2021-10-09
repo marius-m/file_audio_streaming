@@ -9,4 +9,3 @@ class FileAudioStreamerApplication
 fun main(args: Array<String>) {
 	runApplication<FileAudioStreamerApplication>(*args)
 }
-

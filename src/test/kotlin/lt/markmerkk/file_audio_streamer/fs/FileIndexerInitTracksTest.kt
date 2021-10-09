@@ -14,7 +14,7 @@ import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 
-class BookRepositoryInitTracksTest {
+class FileIndexerInitTracksTest {
 
     @Mock lateinit var fsInteractor: FSInteractor
     @Mock lateinit var fsSource: FSSource
@@ -22,18 +22,19 @@ class BookRepositoryInitTracksTest {
     @Mock lateinit var categoryDao: CategoryDao
     @Mock lateinit var booksDao: BookDao
     @Mock lateinit var tracksDao: TrackDao
-    lateinit var bookRepository: BookRepository
+
+    private lateinit var fileIndexer: FileIndexer
 
     @Before
     fun setUp() {
         MockitoAnnotations.initMocks(this)
-        bookRepository = BookRepository(
-                fsInteractor = fsInteractor,
-                fsSource = fsSource,
-                uuidGen = uuidGen,
-                categoryDao = categoryDao,
-                bookDao = booksDao,
-                trackDao = tracksDao
+        fileIndexer = FileIndexer(
+            fsInteractor = fsInteractor,
+            fsSource = fsSource,
+            uuidGen = uuidGen,
+            categoryDao = categoryDao,
+            bookDao = booksDao,
+            trackDao = tracksDao
         )
     }
 
@@ -51,7 +52,7 @@ class BookRepositoryInitTracksTest {
                 .whenever(fsInteractor).filesInPath("/root/books/book1")
 
         // Act
-        val result = bookRepository.initTracksForBook(book1)
+        val result = fileIndexer.initTracksForBook(book1)
 
         // Assert
         val track = result[0]
@@ -75,7 +76,7 @@ class BookRepositoryInitTracksTest {
                 .whenever(fsInteractor).filesInPath("/root/books/book1")
 
         // Act
-        val result = bookRepository.initTracksForBook(book1)
+        val result = fileIndexer.initTracksForBook(book1)
 
         // Assert
         assertThat(result).isEmpty()
@@ -95,7 +96,7 @@ class BookRepositoryInitTracksTest {
                 .whenever(fsInteractor).filesInPath("/root/books/book1")
 
         // Act
-        val result = bookRepository.initTracksForBook(book1)
+        val result = fileIndexer.initTracksForBook(book1)
 
         // Assert
         assertThat(result).isEmpty()

@@ -15,7 +15,7 @@ import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 
-class BookRepositoryInitCategoriesTest {
+class FileIndexerInitCategoriesTest {
 
     @Mock lateinit var fsInteractor: FSInteractor
     @Mock lateinit var fsSource: FSSource
@@ -23,25 +23,26 @@ class BookRepositoryInitCategoriesTest {
     @Mock lateinit var categoryDao: CategoryDao
     @Mock lateinit var booksDao: BookDao
     @Mock lateinit var tracksDao: TrackDao
-    lateinit var bookRepository: BookRepository
+
+    private lateinit var fileIndexer: FileIndexer
 
     @Before
     fun setUp() {
         MockitoAnnotations.initMocks(this)
-        bookRepository = BookRepository(
-                fsInteractor = fsInteractor,
-                fsSource = fsSource,
-                uuidGen = uuidGen,
-                categoryDao = categoryDao,
-                bookDao = booksDao,
-                trackDao = tracksDao
+        fileIndexer = FileIndexer(
+            fsInteractor = fsInteractor,
+            fsSource = fsSource,
+            uuidGen = uuidGen,
+            categoryDao = categoryDao,
+            bookDao = booksDao,
+            trackDao = tracksDao
         )
     }
 
     @Test
     fun noCategories() {
         // Act
-        val result = bookRepository.initCategories(rootPathsWithDelimiter = "")
+        val result = fileIndexer.initCategories(rootPathsWithDelimiter = "")
 
         // Assert
         assertThat(result).isEmpty()
@@ -55,7 +56,7 @@ class BookRepositoryInitCategoriesTest {
                 .whenever(fsInteractor).dirsInPath("/root/books")
 
         // Act
-        val result = bookRepository.initCategories(rootPathsWithDelimiter = "/root/books")
+        val result = fileIndexer.initCategories(rootPathsWithDelimiter = "/root/books")
 
         // Assert
         assertThat(result).containsExactly(
@@ -79,7 +80,7 @@ class BookRepositoryInitCategoriesTest {
                 .whenever(fsInteractor).dirsInPath("/root/books")
 
         // Act
-        val result = bookRepository.initCategories(rootPathsWithDelimiter = "/root/books")
+        val result = fileIndexer.initCategories(rootPathsWithDelimiter = "/root/books")
 
         // Assert
         assertThat(result).containsExactly(
@@ -102,7 +103,7 @@ class BookRepositoryInitCategoriesTest {
                 .whenever(fsInteractor).dirsInPath("/root/books2")
 
         // Act
-        val result = bookRepository.initCategories(
+        val result = fileIndexer.initCategories(
                 rootPathsWithDelimiter = "/root/books,/root/books2"
         )
 

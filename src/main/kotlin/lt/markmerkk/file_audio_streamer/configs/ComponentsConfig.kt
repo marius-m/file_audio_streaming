@@ -10,6 +10,7 @@ import lt.markmerkk.file_audio_streamer.daos.TrackDao
 import lt.markmerkk.file_audio_streamer.fs.BookRepository
 import lt.markmerkk.file_audio_streamer.fs.FSInteractor
 import lt.markmerkk.file_audio_streamer.fs.FSSource
+import lt.markmerkk.file_audio_streamer.fs.FileIndexer
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -86,7 +87,27 @@ class ComponentsConfig {
             categoryDao,
             bookDao,
             trackDao
-        ).apply { renewCache() }
+        )
+    }
+
+    @Bean
+    @Scope("singleton")
+    open fun fileIndexer(
+        fsInteractor: FSInteractor,
+        fsSource: FSSource,
+        uuidGen: UUIDGen,
+        categoryDao: CategoryDao,
+        bookDao: BookDao,
+        trackDao: TrackDao
+    ): FileIndexer {
+        return FileIndexer(
+            fsInteractor,
+            fsSource,
+            uuidGen,
+            categoryDao,
+            bookDao,
+            trackDao
+        ).apply { renewIndex() }
     }
 
     @Bean

@@ -2,6 +2,9 @@
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 <head>
     <th:block th:replace="fragments/frag_res :: css"/>
+    <th:block th:if="${indexStatus.isRunning}">
+        <meta http-equiv="refresh" content="2" >
+    </th:block>
 </head>
 <body>
 <div class="container">
@@ -35,9 +38,14 @@
             </tbody>
         </table>
     </div>
-    <form th:action="@{/re-index}" method="GET">
-        <input type="submit" value="Re-index FS">
-    </form>
+    <th:block th:if="${!indexStatus.isRunning}">
+        <form th:action="@{/re-index}" method="GET">
+            <input type="submit" value="Re-index FS">
+        </form>
+    </th:block>
+    <th:block th:if="${indexStatus.isRunning}">
+        <p th:text="${indexStatus.statusMessage}"></p>
+    </th:block>
 </div>
 
 <th:block th:replace="fragments/frag_res :: js"/>

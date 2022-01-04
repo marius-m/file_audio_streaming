@@ -53,7 +53,12 @@ class BookRepository(
     }
 
     @Throws(IllegalArgumentException::class)
-    fun tracksForBook(bookId: String): List<Track> {
+    fun bookForId(bookId: String): BookEntity {
+        return bookDao.findByLocalId(bookId) ?: throw IllegalArgumentException("No such book")
+    }
+
+    @Throws(IllegalArgumentException::class)
+    fun tracksForBookId(bookId: String): List<Track> {
         val book = bookDao.findByLocalId(bookId) ?: throw IllegalArgumentException("No such book")
         return trackDao.findByBookId(bookId)
                 .map { it.toTrack() }

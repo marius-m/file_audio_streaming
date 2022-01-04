@@ -1,6 +1,5 @@
 package lt.markmerkk.file_audio_streamer.daos
 
-import lt.markmerkk.file_audio_streamer.models.jpa.CategoryEntity
 import lt.markmerkk.file_audio_streamer.models.jpa.TrackEntity
 import org.springframework.data.repository.CrudRepository
 

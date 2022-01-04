@@ -68,7 +68,7 @@ class ApiController {
     fun bookTracks(
             @PathVariable bookId: String
     ): List<TrackResponse> {
-        return bookRepository.tracksForBook(bookId)
+        return bookRepository.tracksForBookId(bookId)
                 .map { TrackResponse.from(it) }
     }
 

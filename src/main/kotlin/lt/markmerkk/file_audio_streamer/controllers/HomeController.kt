@@ -113,12 +113,14 @@ class HomeController(
                 NavItem.asCategoryBooks(bc, categoryId),
                 NavItem.asBook(bc, bookId)
         )
+        val book = bookRepository.bookForId(bookId)
+        val tracksForBook = bookRepository
+            .tracksForBookId(bookId)
+            .sortedBy { it.title }
         model.addAttribute("navItems", navItems)
         model.addAttribute("categoryId", categoryId)
         model.addAttribute("bookId", bookId)
-        val tracksForBook = bookRepository
-                .tracksForBook(bookId)
-                .sortedBy { it.title }
+        model.addAttribute("bookPath", book.path)
         model.addAttribute("tracks", tracksForBook)
         model.addAttribute("indexStatus", fileIndexer.indexStatus())
         return "tracks"
@@ -132,16 +134,19 @@ class HomeController(
             model: Model,
             @PathVariable bookId: String
     ): String {
+
         val navItems = listOf(
                 NavItem.asRoot(bc),
                 NavItem.asCategories(bc),
                 NavItem.asBook(bc, bookId)
         )
+        val book = bookRepository.bookForId(bookId)
+        val tracksForBook = bookRepository
+            .tracksForBookId(bookId)
+            .sortedBy { it.title }
         model.addAttribute("navItems", navItems)
         model.addAttribute("bookId", bookId)
-        val tracksForBook = bookRepository
-                .tracksForBook(bookId)
-                .sortedBy { it.title }
+        model.addAttribute("bookPath", book.path)
         model.addAttribute("tracks", tracksForBook)
         model.addAttribute("indexStatus", fileIndexer.indexStatus())
         return "tracks"

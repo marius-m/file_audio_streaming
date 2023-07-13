@@ -3,16 +3,17 @@ package lt.markmerkk.file_audio_streamer.fs
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import lt.markmerkk.file_audio_streamer.UUIDGen
 import lt.markmerkk.file_audio_streamer.daos.BookDao
 import lt.markmerkk.file_audio_streamer.daos.CategoryDao
+import lt.markmerkk.file_audio_streamer.daos.RootEntryDao
 import lt.markmerkk.file_audio_streamer.daos.TrackDao
 import lt.markmerkk.file_audio_streamer.fs.entities.IndexStats
 import lt.markmerkk.file_audio_streamer.fs.entities.IndexStatus
 import lt.markmerkk.file_audio_streamer.models.Book
 import lt.markmerkk.file_audio_streamer.models.Category
+import lt.markmerkk.file_audio_streamer.models.RootEntry
 import lt.markmerkk.file_audio_streamer.models.Track
 import lt.markmerkk.file_audio_streamer.models.jpa.BookEntity
 import lt.markmerkk.file_audio_streamer.models.jpa.CategoryEntity
@@ -29,6 +30,7 @@ class FileIndexer(
     private val fsInteractor: FSInteractor,
     private val fsSource: FSSource,
     private val uuidGen: UUIDGen,
+    private val rootEntryDao: RootEntryDao,
     private val categoryDao: CategoryDao,
     private val bookDao: BookDao,
     private val trackDao: TrackDao
@@ -139,6 +141,31 @@ class FileIndexer(
         )
     }
 
+    internal fun initRootEntries(
+        rootPathsWithDelimiter: String
+    ): List<RootEntry> {
+        if (rootPathsWithDelimiter.isEmpty()) {
+            return emptyList()
+        }
+        val rootPaths = rootPathsWithDelimiter
+            .split(",")
+        l.info("Scanning for root entries")
+        val rootEntries = rootPaths
+            .mapNotNull { rootPath ->
+                l.info("Resolving root entry ($rootPath)")
+                fsInteractor.resolvePathAsDirectoryOrNull(rootPath)
+            }
+            .map { existingDirectory ->
+                val rootEntry = RootEntry(
+                    id = uuidGen.genFrom(existingDirectory.absolutePath),
+                    path = existingDirectory.absolutePath
+                )
+                l.info("Found RootEntry $rootEntry")
+                rootEntry
+            }
+        return rootEntries
+    }
+
     internal fun initCategories(
         rootPathsWithDelimiter: String
     ): List<Category> {
@@ -157,6 +184,7 @@ class FileIndexer(
             .map { pathToCategory ->
                 val catName = BookRepository.extractNameFromPath(pathToCategory)
                 val cat = Category(
+                    rootEntryId = "", // todo missing binding
                     id = uuidGen.genFrom(pathToCategory),
                     title = catName,
                     path = pathToCategory

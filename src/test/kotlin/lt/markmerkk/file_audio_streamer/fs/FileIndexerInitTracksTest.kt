@@ -7,6 +7,7 @@ import lt.markmerkk.file_audio_streamer.Mocks
 import lt.markmerkk.file_audio_streamer.UUIDGen
 import lt.markmerkk.file_audio_streamer.daos.BookDao
 import lt.markmerkk.file_audio_streamer.daos.CategoryDao
+import lt.markmerkk.file_audio_streamer.daos.RootEntryDao
 import lt.markmerkk.file_audio_streamer.daos.TrackDao
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
@@ -19,6 +20,7 @@ class FileIndexerInitTracksTest {
     @Mock lateinit var fsInteractor: FSInteractor
     @Mock lateinit var fsSource: FSSource
     @Mock lateinit var uuidGen: UUIDGen
+    @Mock lateinit var rootEntryDao: RootEntryDao
     @Mock lateinit var categoryDao: CategoryDao
     @Mock lateinit var booksDao: BookDao
     @Mock lateinit var tracksDao: TrackDao
@@ -32,6 +34,7 @@ class FileIndexerInitTracksTest {
             fsInteractor = fsInteractor,
             fsSource = fsSource,
             uuidGen = uuidGen,
+            rootEntryDao = rootEntryDao,
             categoryDao = categoryDao,
             bookDao = booksDao,
             trackDao = tracksDao

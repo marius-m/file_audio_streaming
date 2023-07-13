@@ -11,47 +11,49 @@ import java.io.File
 object Mocks {
 
     fun createCategory(
-            id: String = "id1",
-            title: String = "books",
-            path: String = "/root/books"
+        rootEntryId: String = "rootEntryId1",
+        id: String = "id1",
+        title: String = "books",
+        path: String = "/root/books"
     ): Category = Category(
-            id = id,
-            title = title,
-            path = path
+        rootEntryId = rootEntryId,
+        id = id,
+        title = title,
+        path = path
     )
 
     fun createTrack2(
-            bookId: String = "id1",
-            id: String = "id1",
-            rawTitle: String = "book1.mp3",
-            path: String = "/root/books/book1.mp3"
+        bookId: String = "id1",
+        id: String = "id1",
+        rawTitle: String = "book1.mp3",
+        path: String = "/root/books/book1.mp3"
     ): Track = Track(
-            bookId = bookId,
-            id = id,
-            rawFileName = rawTitle,
-            path = path
+        bookId = bookId,
+        id = id,
+        rawFileName = rawTitle,
+        path = path
     )
 
     fun createBook(
-            categoryId: String = "c_id1",
-            id: String = "b_id1",
-            title: String = "books",
-            path: String = "/root/books"
+        categoryId: String = "c_id1",
+        id: String = "b_id1",
+        title: String = "books",
+        path: String = "/root/books"
     ): Book = Book(
-            categoryId = categoryId,
-            id = id,
-            title = title,
-            path = path
+        categoryId = categoryId,
+        id = id,
+        title = title,
+        path = path
     )
 
     //region Mocks
 
     fun mockFile(
-            exists: Boolean = true,
-            isDirectory: Boolean = false,
-            isFile: Boolean = true,
-            name: String = "valid_file",
-            absolutePath: String = "valid_path"
+        exists: Boolean = true,
+        isDirectory: Boolean = false,
+        isFile: Boolean = true,
+        name: String = "valid_file",
+        absolutePath: String = "valid_path"
     ): File {
         val file: File = mock()
         doReturn(exists).whenever(file).exists()
@@ -63,23 +65,25 @@ object Mocks {
     }
 
     fun mockFileAsFile(
-            exists: Boolean = true,
-            name: String = "valid_file"
+        exists: Boolean = true,
+        name: String = "valid_file"
     ): File = mockFile(
-            exists = exists,
-            isDirectory = false,
-            isFile = true,
-            name = name
+        exists = exists,
+        isDirectory = false,
+        isFile = true,
+        name = name
     )
 
     fun mockFileAsDirectory(
-            exists: Boolean = true,
-            name: String = "valid_dir"
+        exists: Boolean = true,
+        name: String = "valid_dir",
+        absolutePath: String = "/root/${name}",
     ): File = mockFile(
-            exists = exists,
-            isDirectory = true,
-            isFile = false,
-            name = name
+        exists = exists,
+        isDirectory = true,
+        isFile = false,
+        name = name,
+        absolutePath = absolutePath,
     )
 
     //endregion

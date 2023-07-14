@@ -9,6 +9,21 @@ class FSInteractor(
         private val resourceLoader: ResourceLoader
 ) {
 
+    /**
+     * @return valid and existing directory
+     */
+    fun resolvePathAsHealthyDirectoryOrNull(path: String): File? {
+        val rootFile: File = ResourcePatternUtils
+            .getResourcePatternResolver(resourceLoader)
+            .getResource("file:$path")
+            .file
+        return if (rootFile.exists() && rootFile.isDirectory) {
+            File(path)
+        } else {
+            null
+        }
+    }
+
     fun dirsInPath(path: String): List<File> {
         val rootFile: File = ResourcePatternUtils
                 .getResourcePatternResolver(resourceLoader)

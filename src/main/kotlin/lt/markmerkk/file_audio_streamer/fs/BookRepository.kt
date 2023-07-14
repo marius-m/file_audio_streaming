@@ -3,12 +3,15 @@ package lt.markmerkk.file_audio_streamer.fs
 import lt.markmerkk.file_audio_streamer.UUIDGen
 import lt.markmerkk.file_audio_streamer.daos.BookDao
 import lt.markmerkk.file_audio_streamer.daos.CategoryDao
+import lt.markmerkk.file_audio_streamer.daos.RootEntryDao
 import lt.markmerkk.file_audio_streamer.daos.TrackDao
 import lt.markmerkk.file_audio_streamer.models.Book
 import lt.markmerkk.file_audio_streamer.models.Category
+import lt.markmerkk.file_audio_streamer.models.RootEntry
 import lt.markmerkk.file_audio_streamer.models.Track
 import lt.markmerkk.file_audio_streamer.models.jpa.BookEntity
 import lt.markmerkk.file_audio_streamer.models.jpa.CategoryEntity
+import lt.markmerkk.file_audio_streamer.models.jpa.RootEntryEntity
 import lt.markmerkk.file_audio_streamer.models.jpa.TrackEntity
 import org.apache.commons.lang3.time.StopWatch
 import org.slf4j.LoggerFactory
@@ -17,11 +20,17 @@ class BookRepository(
         private val fsInteractor: FSInteractor,
         private val fsSource: FSSource,
         private val uuidGen: UUIDGen,
+        private val rootEntryDao: RootEntryDao,
         private val categoryDao: CategoryDao,
         private val bookDao: BookDao,
         private val trackDao: TrackDao
 ) {
 
+    fun rootEntries(): List<RootEntry> {
+        return rootEntryDao
+            .findAll()
+            .map { it.toRootEntry() }
+    }
 
     fun categories(): List<Category> {
         return categoryDao

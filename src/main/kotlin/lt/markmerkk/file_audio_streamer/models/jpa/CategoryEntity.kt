@@ -6,6 +6,7 @@ import javax.persistence.*
 @Entity(name = "category")
 class CategoryEntity(
         @Id @GeneratedValue(strategy = GenerationType.AUTO) val id: Long = 0,
+        @Column val rootEntryId: String,
         @Column(unique = true) val localId: String,
         @Column val title: String,
         @Column val titleEng: String,
@@ -13,18 +14,20 @@ class CategoryEntity(
 ) {
 
     fun toCategory(): Category = Category(
-            id = localId,
-            title = title,
-            path = path
+        rootEntryId = rootEntryId,
+        id = localId,
+        title = title,
+        path = path
     )
 
     companion object {
         fun from(category: Category): CategoryEntity {
             return CategoryEntity(
-                    localId = category.id,
-                    title = category.title,
-                    titleEng = category.titleEng,
-                    path = category.path
+                rootEntryId = category.rootEntryId,
+                localId = category.id,
+                title = category.title,
+                titleEng = category.titleEng,
+                path = category.path
             )
         }
     }

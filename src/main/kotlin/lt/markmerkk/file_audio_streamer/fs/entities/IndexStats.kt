@@ -1,13 +1,15 @@
 package lt.markmerkk.file_audio_streamer.fs.entities
 
 data class IndexStats(
-    val isIndexedCategories: Boolean = false,
+    val hasIndexedRootEntries: Boolean = false,
+    val rootEntryCount: Int = 0,
+    val hasIndexedCategories: Boolean = false,
     val categoryCount: Int = 0,
-    val isIndexedBooks: Boolean = false,
+    val hasIndexedBooks: Boolean = false,
     val bookCount: Int = 0,
-    val isIndexedTracks: Boolean = false,
+    val hasIndexedTracks: Boolean = false,
     val trackCount: Int = 0,
-    val isIndexedEmptyBooks: Boolean = false,
+    val hasIndexedEmptyBooks: Boolean = false,
     val emptyBookCount: Int = 0,
 ) {
 
@@ -17,13 +19,15 @@ data class IndexStats(
 
     fun report(): String {
         val sb = StringBuilder()
-        sb.append(generateState("Categories", isIndexedCategories, categoryCount))
+        sb.append(generateState("Root entries", hasIndexedRootEntries, rootEntryCount))
         sb.append("\n")
-        sb.append(generateState("Books", isIndexedBooks, bookCount))
+        sb.append(generateState("Categories", hasIndexedCategories, categoryCount))
         sb.append("\n")
-        sb.append(generateState("Tracks", isIndexedTracks, trackCount))
+        sb.append(generateState("Books", hasIndexedBooks, bookCount))
         sb.append("\n")
-        sb.append(generateState("Empty books", isIndexedEmptyBooks, emptyBookCount))
+        sb.append(generateState("Tracks", hasIndexedTracks, trackCount))
+        sb.append("\n")
+        sb.append(generateState("Empty books", hasIndexedEmptyBooks, emptyBookCount))
         return sb.toString()
     }
 
@@ -35,55 +39,66 @@ data class IndexStats(
         }
     }
 
+    class IndexStatsBuilder(
+        private var hasIndexedRootEntries: Boolean = false,
+        private var rootEntryCount: Int = 0,
+        private var hasIndexedCategories: Boolean = false,
+        private var categoryCount: Int = 0,
+        private var hasIndexedBooks: Boolean = false,
+        private var bookCount: Int = 0,
+        private var hasIndexedTracks: Boolean = false,
+        private var trackCount: Int = 0,
+        private var hasIndexedEmptyBooks: Boolean = false,
+        private var emptyBookCount: Int = 0,
+    ) {
+
+        fun appendRootEntries(rootEntryCount: Int): IndexStatsBuilder {
+            this.hasIndexedRootEntries = true
+            this.rootEntryCount = rootEntryCount
+            return this
+        }
+
+        fun appendCategories(categoryCount: Int): IndexStatsBuilder {
+            this.hasIndexedCategories = true
+            this.categoryCount = categoryCount
+            return this
+        }
+
+        fun appendBooks(bookCount: Int): IndexStatsBuilder {
+            this.hasIndexedBooks = true
+            this.bookCount = bookCount
+            return this
+        }
+
+        fun appendTracks(trackCount: Int): IndexStatsBuilder {
+            this.hasIndexedTracks = true
+            this.trackCount = trackCount
+            return this
+        }
+
+        fun appendEmptyBooks(emptyBookCount: Int): IndexStatsBuilder {
+            this.hasIndexedEmptyBooks = true
+            this.emptyBookCount = emptyBookCount
+            return this
+        }
+
+        fun build(): IndexStats {
+            return IndexStats(
+                hasIndexedRootEntries = this.hasIndexedRootEntries,
+                rootEntryCount = this.rootEntryCount,
+                hasIndexedCategories = this.hasIndexedCategories,
+                categoryCount = this.categoryCount,
+                hasIndexedBooks = this.hasIndexedBooks,
+                bookCount = this.bookCount,
+                hasIndexedTracks = this.hasIndexedTracks,
+                trackCount = this.trackCount,
+                hasIndexedEmptyBooks = this.hasIndexedEmptyBooks,
+                emptyBookCount = this.emptyBookCount,
+            )
+        }
+    }
+
     companion object {
         fun asEmpty() = IndexStats()
-        fun withCats(categoryCount: Int): IndexStats {
-            return IndexStats(
-                isIndexedCategories = true,
-                categoryCount = categoryCount
-            )
-        }
-
-        fun withCatsBooks(categoryCount: Int, bookCount: Int): IndexStats {
-            return IndexStats(
-                isIndexedCategories = true,
-                categoryCount = categoryCount,
-                isIndexedBooks = true,
-                bookCount = bookCount,
-            )
-        }
-
-        fun withCatsBooksTracks(
-            categoryCount: Int,
-            bookCount: Int,
-            trackCount: Int,
-        ): IndexStats {
-            return IndexStats(
-                isIndexedCategories = true,
-                categoryCount = categoryCount,
-                isIndexedBooks = true,
-                bookCount = bookCount,
-                isIndexedTracks = true,
-                trackCount = trackCount,
-            )
-        }
-
-        fun withCatsBooksTracksEB(
-            categoryCount: Int,
-            bookCount: Int,
-            trackCount: Int,
-            emptyBookCount: Int,
-        ): IndexStats {
-            return IndexStats(
-                isIndexedCategories = true,
-                categoryCount = categoryCount,
-                isIndexedBooks = true,
-                bookCount = bookCount,
-                isIndexedTracks = true,
-                trackCount = trackCount,
-                isIndexedEmptyBooks = true,
-                emptyBookCount = emptyBookCount,
-            )
-        }
     }
 }

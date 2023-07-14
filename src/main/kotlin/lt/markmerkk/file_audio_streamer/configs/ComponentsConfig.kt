@@ -6,6 +6,7 @@ import lt.markmerkk.file_audio_streamer.BuildConfig
 import lt.markmerkk.file_audio_streamer.UUIDGen
 import lt.markmerkk.file_audio_streamer.daos.BookDao
 import lt.markmerkk.file_audio_streamer.daos.CategoryDao
+import lt.markmerkk.file_audio_streamer.daos.RootEntryDao
 import lt.markmerkk.file_audio_streamer.daos.TrackDao
 import lt.markmerkk.file_audio_streamer.fs.BookRepository
 import lt.markmerkk.file_audio_streamer.fs.FSInteractor
@@ -76,6 +77,7 @@ class ComponentsConfig {
         fsInteractor: FSInteractor,
         fsSource: FSSource,
         uuidGen: UUIDGen,
+        rootEntryDao: RootEntryDao,
         categoryDao: CategoryDao,
         bookDao: BookDao,
         trackDao: TrackDao
@@ -84,6 +86,7 @@ class ComponentsConfig {
             fsInteractor,
             fsSource,
             uuidGen,
+            rootEntryDao,
             categoryDao,
             bookDao,
             trackDao
@@ -96,6 +99,7 @@ class ComponentsConfig {
         fsInteractor: FSInteractor,
         fsSource: FSSource,
         uuidGen: UUIDGen,
+        rootEntryDao: RootEntryDao,
         categoryDao: CategoryDao,
         bookDao: BookDao,
         trackDao: TrackDao
@@ -104,6 +108,7 @@ class ComponentsConfig {
             fsInteractor,
             fsSource,
             uuidGen,
+            rootEntryDao,
             categoryDao,
             bookDao,
             trackDao

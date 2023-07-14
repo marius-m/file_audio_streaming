@@ -9,7 +9,6 @@ import lt.markmerkk.file_audio_streamer.daos.BookDao
 import lt.markmerkk.file_audio_streamer.daos.CategoryDao
 import lt.markmerkk.file_audio_streamer.daos.RootEntryDao
 import lt.markmerkk.file_audio_streamer.daos.TrackDao
-import lt.markmerkk.file_audio_streamer.models.Category
 import lt.markmerkk.file_audio_streamer.models.RootEntry
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
@@ -57,7 +56,7 @@ class FileIndexerInitRootEntriesTest {
         // Assemble
         doReturn("id1").whenever(uuidGen).genFrom(any())
         doReturn(Mocks.mockFileAsDirectory(exists = true, name = "books1"))
-                .whenever(fsInteractor).resolvePathAsDirectoryOrNull("/root/books")
+                .whenever(fsInteractor).resolvePathAsHealthyDirectoryOrNull("/root/books")
 
         // Act
         val result = fileIndexer.initRootEntries(rootPathsWithDelimiter = "/root/books")
@@ -74,9 +73,9 @@ class FileIndexerInitRootEntriesTest {
         doReturn("id1").whenever(uuidGen).genFrom("/root/books1")
         doReturn("id2").whenever(uuidGen).genFrom("/root/books2")
         doReturn(Mocks.mockFileAsDirectory(exists = true, name = "books1"))
-            .whenever(fsInteractor).resolvePathAsDirectoryOrNull("/root/books1")
+            .whenever(fsInteractor).resolvePathAsHealthyDirectoryOrNull("/root/books1")
         doReturn(Mocks.mockFileAsDirectory(exists = true, name = "books2"))
-            .whenever(fsInteractor).resolvePathAsDirectoryOrNull("/root/books2")
+            .whenever(fsInteractor).resolvePathAsHealthyDirectoryOrNull("/root/books2")
 
         // Act
         val result = fileIndexer.initRootEntries(
@@ -96,9 +95,9 @@ class FileIndexerInitRootEntriesTest {
         doReturn("id1").whenever(uuidGen).genFrom("/root/books1")
         doReturn("id2").whenever(uuidGen).genFrom("/root/books2")
         doReturn(Mocks.mockFileAsDirectory(exists = true, name = "books1"))
-            .whenever(fsInteractor).resolvePathAsDirectoryOrNull("/root/books1")
+            .whenever(fsInteractor).resolvePathAsHealthyDirectoryOrNull("/root/books1")
         doReturn(null)
-            .whenever(fsInteractor).resolvePathAsDirectoryOrNull("/root/books2")
+            .whenever(fsInteractor).resolvePathAsHealthyDirectoryOrNull("/root/books2")
 
         // Act
         val result = fileIndexer.initRootEntries(

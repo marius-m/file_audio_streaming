@@ -4,6 +4,7 @@ import lt.markmerkk.file_audio_streamer.fs.BookRepository
 import lt.markmerkk.file_audio_streamer.fs.FSInteractor
 import lt.markmerkk.file_audio_streamer.responses.BookResponse
 import lt.markmerkk.file_audio_streamer.responses.CategoryResponse
+import lt.markmerkk.file_audio_streamer.responses.HealthResponse
 import lt.markmerkk.file_audio_streamer.responses.TrackResponse
 import lt.markmerkk.utils.MultipartFileSender
 import org.springframework.beans.factory.annotation.Autowired
@@ -13,6 +14,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.*
 import java.io.File
+import java.lang.IllegalStateException
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
@@ -92,6 +94,25 @@ class ApiController {
                 .serveResource()
     }
 
+    @RequestMapping(
+        value = ["/health"],
+        method = [RequestMethod.GET],
+        produces = ["application/json"]
+    )
+    @ResponseBody
+    @Throws(UnhealthyRootEntryException::class)
+    fun health(): HealthResponse {
+        val rootEntries = bookRepository.rootEntries()
+        val healthResponse = HealthResponse.resolveHealth(
+            fsInteractor = fsInteractor,
+            rootEntries = rootEntries,
+        )
+        if (healthResponse.status != HealthResponse.Status.OK) {
+            throw UnhealthyRootEntryException(healthResponse = healthResponse)
+        }
+        return healthResponse
+    }
+
     //region Classes
 
     @ResponseStatus(value = HttpStatus.NOT_FOUND)
@@ -102,6 +123,11 @@ class ApiController {
 
     @ResponseStatus(value = HttpStatus.NOT_FOUND)
     class TrackNotFoundException: IllegalArgumentException()
+
+    @ResponseStatus(value = HttpStatus.NOT_FOUND)
+    class UnhealthyRootEntryException(healthResponse: HealthResponse): IllegalStateException(
+        healthResponse.toString()
+    )
 
     //endregion
 

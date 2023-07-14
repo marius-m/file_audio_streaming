@@ -154,7 +154,7 @@ class FileIndexer(
         val rootEntries = rootPaths
             .mapNotNull { rootPath ->
                 l.info("Resolving root entry ($rootPath)")
-                fsInteractor.resolvePathAsDirectoryOrNull(rootPath)
+                fsInteractor.resolvePathAsHealthyDirectoryOrNull(rootPath)
             }
             .map { existingDirectory ->
                 val rootEntry = RootEntry(

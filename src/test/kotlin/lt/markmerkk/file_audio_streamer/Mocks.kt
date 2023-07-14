@@ -5,10 +5,19 @@ import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.whenever
 import lt.markmerkk.file_audio_streamer.models.Book
 import lt.markmerkk.file_audio_streamer.models.Category
+import lt.markmerkk.file_audio_streamer.models.RootEntry
 import lt.markmerkk.file_audio_streamer.models.Track
 import java.io.File
 
 object Mocks {
+
+    fun createRootEntry(
+        id: String = "id1",
+        path: String = "/root/books"
+    ): RootEntry = RootEntry(
+        id = id,
+        path = path,
+    )
 
     fun createCategory(
         rootEntryId: String = "rootEntryId1",

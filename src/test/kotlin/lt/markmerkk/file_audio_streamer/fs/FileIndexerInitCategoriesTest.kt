@@ -42,78 +42,84 @@ class FileIndexerInitCategoriesTest {
         )
     }
 
-//    @Test
-//    fun noCategories() {
-//        // Act
-//        val result = fileIndexer.initCategories(rootPathsWithDelimiter = "")
-//
-//        // Assert
-//        assertThat(result).isEmpty()
-//    }
-//
-//    @Test
-//    fun oneCategory() {
-//        // Assemble
-//        doReturn("id1").whenever(uuidGen).genFrom(any())
-//        doReturn(listOf(Mocks.mockFile(absolutePath = "/root/books/book1")))
-//                .whenever(fsInteractor).dirsInPath("/root/books")
-//
-//        // Act
-//        val result = fileIndexer.initCategories(rootPathsWithDelimiter = "/root/books")
-//
-//        // Assert
-//        assertThat(result).containsExactly(
-//                Category(id = "id1", title = "book1", path = "/root/books/book1")
-//        )
-//    }
-//
-//    @Test
-//    fun multiCatInOneSource() {
-//        // Assemble
-//        val categories = listOf(
-//                Mocks.mockFile(absolutePath = "/root/books/book1"),
-//                Mocks.mockFile(absolutePath = "/root/books/book2"),
-//                Mocks.mockFile(absolutePath = "/root/books/book3")
-//        )
-//        doReturn("id1")
-//                .doReturn("id2")
-//                .doReturn("id3")
-//                .whenever(uuidGen).genFrom(any())
-//        doReturn(categories)
-//                .whenever(fsInteractor).dirsInPath("/root/books")
-//
-//        // Act
-//        val result = fileIndexer.initCategories(rootPathsWithDelimiter = "/root/books")
-//
-//        // Assert
-//        assertThat(result).containsExactly(
-//                Category(id = "id1", title = "book1", path = "/root/books/book1"),
-//                Category(id = "id2", title = "book2", path = "/root/books/book2"),
-//                Category(id = "id3", title = "book3", path = "/root/books/book3")
-//        )
-//    }
-//
-//    @Test
-//    fun multipleSources() {
-//        // Assemble
-//        doReturn("id1")
-//                .doReturn("id2")
-//                .doReturn("id3")
-//                .whenever(uuidGen).genFrom(any())
-//        doReturn(listOf(Mocks.mockFile(absolutePath = "/root/books/book1")))
-//                .whenever(fsInteractor).dirsInPath("/root/books")
-//        doReturn(listOf(Mocks.mockFile(absolutePath = "/root/books2/book1")))
-//                .whenever(fsInteractor).dirsInPath("/root/books2")
-//
-//        // Act
-//        val result = fileIndexer.initCategories(
-//                rootPathsWithDelimiter = "/root/books,/root/books2"
-//        )
-//
-//        // Assert
-//        assertThat(result).containsExactly(
-//                Category(id = "id1", title = "book1", path = "/root/books/book1"),
-//                Category(id = "id2", title = "book1", path = "/root/books2/book1")
-//        )
-//    }
+    @Test
+    fun noCategories() {
+        // Act
+        val result = fileIndexer.initCategories(rootEntries = emptyList())
+
+        // Assert
+        assertThat(result).isEmpty()
+    }
+
+    @Test
+    fun oneCategory() {
+        // Assemble
+        val rootEntries = listOf(Mocks.createRootEntry(path = "/root/books1"))
+        doReturn("id1").whenever(uuidGen).genFrom(any())
+        doReturn(listOf(Mocks.mockFile(absolutePath = "/root/books/book1")))
+                .whenever(fsInteractor).dirsInPath("/root/books1")
+
+        // Act
+        val result = fileIndexer.initCategories(rootEntries = rootEntries)
+
+        // Assert
+        assertThat(result).containsExactly(
+            Category(rootEntryId = "id1", id = "id1", title = "book1", path = "/root/books/book1")
+        )
+    }
+
+    @Test
+    fun multiCatInOneSource() {
+        // Assemble
+        val rootEntries = listOf(
+            Mocks.createRootEntry(path = "/root/books"),
+        )
+        val categories = listOf(
+                Mocks.mockFile(absolutePath = "/root/books/book1"),
+                Mocks.mockFile(absolutePath = "/root/books/book2"),
+                Mocks.mockFile(absolutePath = "/root/books/book3")
+        )
+        doReturn("id1")
+                .doReturn("id2")
+                .doReturn("id3")
+                .whenever(uuidGen).genFrom(any())
+        doReturn(categories)
+                .whenever(fsInteractor).dirsInPath("/root/books")
+
+        // Act
+        val result = fileIndexer.initCategories(rootEntries)
+
+        // Assert
+        assertThat(result).containsExactly(
+                Category(rootEntryId = "id1", id = "id1", title = "book1", path = "/root/books/book1"),
+                Category(rootEntryId = "id1", id = "id2", title = "book2", path = "/root/books/book2"),
+                Category(rootEntryId = "id1", id = "id3", title = "book3", path = "/root/books/book3")
+        )
+    }
+
+    @Test
+    fun multipleSources() {
+        // Assemble
+        val rootEntries = listOf(
+            Mocks.createRootEntry(id = "r_id1", path = "/root/books1"),
+            Mocks.createRootEntry(id = "r_id2", path = "/root/books2"),
+        )
+        doReturn("id1")
+                .doReturn("id2")
+                .doReturn("id3")
+                .whenever(uuidGen).genFrom(any())
+        doReturn(listOf(Mocks.mockFile(absolutePath = "/root/books1/book1")))
+                .whenever(fsInteractor).dirsInPath("/root/books1")
+        doReturn(listOf(Mocks.mockFile(absolutePath = "/root/books2/book1")))
+                .whenever(fsInteractor).dirsInPath("/root/books2")
+
+        // Act
+        val result = fileIndexer.initCategories(rootEntries)
+
+        // Assert
+        assertThat(result).containsExactly(
+            Category(rootEntryId = "r_id1", id = "id1", title = "book1", path = "/root/books1/book1"),
+            Category(rootEntryId = "r_id2", id = "id2", title = "book1", path = "/root/books2/book1")
+        )
+    }
 }

@@ -17,6 +17,7 @@ import lt.markmerkk.file_audio_streamer.models.RootEntry
 import lt.markmerkk.file_audio_streamer.models.Track
 import lt.markmerkk.file_audio_streamer.models.jpa.BookEntity
 import lt.markmerkk.file_audio_streamer.models.jpa.CategoryEntity
+import lt.markmerkk.file_audio_streamer.models.jpa.RootEntryEntity
 import lt.markmerkk.file_audio_streamer.models.jpa.TrackEntity
 import org.apache.commons.lang3.time.StopWatch
 import org.slf4j.LoggerFactory
@@ -75,12 +76,20 @@ class FileIndexer(
     }
 
     private suspend fun internalRenewCache(sw: StopWatch) {
-        indexStats = IndexStats.asEmpty()
+        val isBuilder = IndexStats.IndexStatsBuilder()
+        indexStats = isBuilder.build()
+        rootEntryDao.deleteAll()
         categoryDao.deleteAll()
         bookDao.deleteAll()
         trackDao.deleteAll()
+        l.info("Mapping root entries...")
+        val rootEntries = initRootEntries(rootPathsWithDelimiter = fsSource.rootPathsWithDelimiter)
+        rootEntryDao.saveAll(RootEntryEntity.from(rootEntries))
+        indexStats = isBuilder
+            .appendRootEntries(rootEntries.size)
+            .build()
         l.info("Looking for categories...")
-        val categories = initCategories(rootPathsWithDelimiter = fsSource.rootPathsWithDelimiter)
+        val categories = initCategories(rootEntries)
             .map { it.id to it }
             .toMap()
         val categoriesAsDaoObj = categories.values
@@ -88,9 +97,9 @@ class FileIndexer(
         categoryDao.saveAll(categoriesAsDaoObj)
         l.info("Category scan finish (${sw.time}ms)")
         l.info("Looking for books...")
-        indexStats = IndexStats.withCats(
-            categoryCount = categories.size
-        )
+        indexStats = isBuilder
+            .appendCategories(categories.size)
+            .build()
         val books: Map<String, Book> = categories.values
             .flatMap { initBooksForCategory(it) }
             .map { it.id to it }
@@ -100,10 +109,7 @@ class FileIndexer(
         bookDao.saveAll(booksAsDaoObj)
         l.info("Book scan finish (${sw.time}ms)")
         l.info("Looking for tracks...")
-        indexStats = IndexStats.withCatsBooks(
-            categoryCount = categories.size,
-            bookCount = books.size,
-        )
+        indexStats = isBuilder.appendBooks(books.size).build()
         val tracks: Map<String, Track> = books.values
             .flatMap { initTracksForBook(it) }
             .map { it.id to it }
@@ -112,11 +118,9 @@ class FileIndexer(
             .map { TrackEntity.from(it) }
         trackDao.saveAll(tracksAsDaoObj)
         l.info("Track scan finish (${sw.time}ms)")
-        indexStats = IndexStats.withCatsBooksTracks(
-            categoryCount = categories.size,
-            bookCount = books.size,
-            trackCount = tracks.size,
-        )
+        indexStats = isBuilder
+            .appendTracks(tracks.size)
+            .build()
         l.info("Removing books with empty tracks...")
         val emptyBooks = books.values
             .filter { book ->
@@ -133,12 +137,9 @@ class FileIndexer(
                     bookDao.delete(emptyBookEntity)
                 }
             }
-        indexStats = IndexStats.withCatsBooksTracksEB(
-            categoryCount = categories.size,
-            bookCount = books.size,
-            trackCount = tracks.size,
-            emptyBookCount = emptyBooks.size,
-        )
+        indexStats = isBuilder
+            .appendEmptyBooks(emptyBooks.size)
+            .build()
     }
 
     internal fun initRootEntries(
@@ -167,32 +168,32 @@ class FileIndexer(
     }
 
     internal fun initCategories(
-        rootPathsWithDelimiter: String
+        rootEntries: List<RootEntry>,
     ): List<Category> {
-        if (rootPathsWithDelimiter.isEmpty()) {
+        if (rootEntries.isEmpty()) {
             return emptyList()
         }
-        val rootPaths = rootPathsWithDelimiter
-            .split(",")
         l.info("Scanning for categories")
-        val cateogries = rootPaths
-            .flatMap {
-                l.info("Scanning categories in $it")
-                fsInteractor.dirsInPath(it)
+        return rootEntries
+            .map { rootEntry ->
+                l.info("Scanning categories in $rootEntry")
+                rootEntry to fsInteractor.dirsInPath(rootEntry.path)
             }
-            .map { it.absolutePath }
-            .map { pathToCategory ->
-                val catName = BookRepository.extractNameFromPath(pathToCategory)
-                val cat = Category(
-                    rootEntryId = "", // todo missing binding
-                    id = uuidGen.genFrom(pathToCategory),
-                    title = catName,
-                    path = pathToCategory
-                )
-                l.info("Found category $cat")
-                cat
+            .flatMap { (rootEntry, categoryDirs) ->
+                val categories = categoryDirs.map { categoryDir ->
+                    val categoryDirPath = categoryDir.absolutePath
+                    val catName = BookRepository.extractNameFromPath(categoryDirPath)
+                    val cat = Category(
+                        rootEntryId = rootEntry.id,
+                        id = uuidGen.genFrom(categoryDirPath),
+                        title = catName,
+                        path = categoryDirPath
+                    )
+                    l.info("Found category $cat")
+                    cat
+                }
+                categories
             }
-        return cateogries
     }
 
     internal fun initBooksForCategory(category: Category): List<Book> {

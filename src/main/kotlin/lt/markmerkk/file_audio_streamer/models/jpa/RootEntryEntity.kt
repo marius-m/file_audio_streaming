@@ -22,5 +22,9 @@ class RootEntryEntity(
                     path = rootEntry.path
             )
         }
+
+        fun from(rootEntries: List<RootEntry>): List<RootEntryEntity> {
+            return rootEntries.map { from(it) }
+        }
     }
 }

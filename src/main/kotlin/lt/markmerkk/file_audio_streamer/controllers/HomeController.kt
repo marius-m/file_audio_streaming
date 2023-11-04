@@ -21,6 +21,16 @@ class HomeController(
     @Autowired val fileIndexer: FileIndexer,
 ) {
 
+//    @RequestMapping(
+//        value = ["/customError"],
+//        method = [RequestMethod.GET]
+//    )
+//    fun renderError(
+//        model: Model
+//    ): String {
+//        error("Test error")
+//    }
+
     @RequestMapping(
             value = ["/categories"],
             method = [RequestMethod.GET]

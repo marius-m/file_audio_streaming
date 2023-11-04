@@ -118,14 +118,14 @@ class ComponentsConfig {
     @Bean
     @Profile("prod")
     @Scope("singleton")
-    open fun sentryClientProd(): SentryClient {
+    open fun sentryClientProd(): Unit {
         return Sentry.init("https://948d91b168824f27a0490a1484b692c3@o348125.ingest.sentry.io/5289085")
     }
 
     @Bean
     @Profile("dev")
     @Scope("singleton")
-    open fun sentryClientDev(): SentryClient {
+    open fun sentryClientDev(): Unit {
         return Sentry.init()
     }
 }

@@ -198,7 +198,11 @@ class FileIndexer(
 
     internal fun initBooksForCategory(category: Category): List<Book> {
         l.info("Scanning books for Category(${category.title} / ${category.path})")
-        val books = fsInteractor.dirsInPath(category.path)
+        val dirsInPath = fsInteractor.dirsInPath(category.path)
+        val dirsInPathAsString = dirsInPath
+            .map { it.absolutePath }
+        l.debug("Found raw books: ${dirsInPathAsString}")
+        val books = dirsInPath
             .filter { it.isDirectory }
             .map { it.absolutePath }
             .map { pathToBook ->

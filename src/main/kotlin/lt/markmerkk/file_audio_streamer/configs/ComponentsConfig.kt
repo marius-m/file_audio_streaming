@@ -1,7 +1,9 @@
 package lt.markmerkk.file_audio_streamer.configs
 
 import io.sentry.Sentry
+import io.sentry.Sentry.OptionsConfiguration
 import io.sentry.SentryClient
+import io.sentry.SentryOptions
 import lt.markmerkk.file_audio_streamer.BuildConfig
 import lt.markmerkk.file_audio_streamer.UUIDGen
 import lt.markmerkk.file_audio_streamer.daos.BookDao
@@ -126,6 +128,6 @@ class ComponentsConfig {
     @Profile("dev")
     @Scope("singleton")
     open fun sentryClientDev(): Unit {
-        return Sentry.init()
+        return Sentry.init { options -> options.isEnabled = false }
     }
 }

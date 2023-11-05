@@ -220,7 +220,10 @@ class FileIndexer(
     }
 
     internal fun initTracksForBook(book: Book): List<Track> {
-        val tracks = fsInteractor.filesInPath(book.path)
+        val filesInPath = fsInteractor.filesInPath(book.path)
+        val filesInPathAsString = filesInPath.map { it.absolutePath }
+        l.debug("Found raw tracks (${filesInPath.size}) for Book(${book.id} / ${book.title} / ${book.path}): ${filesInPathAsString}")
+        val tracks = filesInPath
             .map { trackAsFile ->
                 Track(
                     bookId = book.id,

@@ -41,7 +41,12 @@
         <appender-ref ref="RollingFile" />
     </logger>
 
-    <root level="debug">
+    <logger name="lt.markmerkk" level="debug" additivity="false">
+        <appender-ref ref="Console" />
+        <appender-ref ref="RollingFile" />
+    </logger>
+
+    <root level="info">
         <appender-ref ref="RollingFile" />
         <appender-ref ref="Console" />
         <appender-ref ref="Sentry" />

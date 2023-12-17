@@ -3,6 +3,8 @@ package lt.markmerkk.file_audio_streamer.fs
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.doReturn
 import com.nhaarman.mockito_kotlin.whenever
+import lt.markmerkk.FileInfoProviderTest
+import lt.markmerkk.TimeProviderTest
 import lt.markmerkk.file_audio_streamer.Mocks
 import lt.markmerkk.file_audio_streamer.UUIDGen
 import lt.markmerkk.file_audio_streamer.daos.BookDao
@@ -10,6 +12,7 @@ import lt.markmerkk.file_audio_streamer.daos.CategoryDao
 import lt.markmerkk.file_audio_streamer.daos.RootEntryDao
 import lt.markmerkk.file_audio_streamer.daos.TrackDao
 import lt.markmerkk.file_audio_streamer.models.Category
+import lt.markmerkk.file_audio_streamer.models.CategoryFile
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
 import org.junit.Test
@@ -38,7 +41,9 @@ class FileIndexerInitCategoriesTest {
             rootEntryDao = rootEntryDao,
             categoryDao = categoryDao,
             bookDao = booksDao,
-            trackDao = tracksDao
+            trackDao = tracksDao,
+            timeProvider = TimeProviderTest,
+            fileInfoProvider = FileInfoProviderTest,
         )
     }
 
@@ -64,7 +69,12 @@ class FileIndexerInitCategoriesTest {
 
         // Assert
         assertThat(result).containsExactly(
-            Category(rootEntryId = "id1", id = "id1", title = "book1", path = "/root/books/book1")
+            Mocks.createCategoryFile(
+                rootEntryId = "id1",
+                id = "id1",
+                title = "book1",
+                path = "/root/books/book1"
+            )
         )
     }
 
@@ -91,9 +101,9 @@ class FileIndexerInitCategoriesTest {
 
         // Assert
         assertThat(result).containsExactly(
-                Category(rootEntryId = "id1", id = "id1", title = "book1", path = "/root/books/book1"),
-                Category(rootEntryId = "id1", id = "id2", title = "book2", path = "/root/books/book2"),
-                Category(rootEntryId = "id1", id = "id3", title = "book3", path = "/root/books/book3")
+                Mocks.createCategoryFile(rootEntryId = "id1", id = "id1", title = "book1", path = "/root/books/book1"),
+                Mocks.createCategoryFile(rootEntryId = "id1", id = "id2", title = "book2", path = "/root/books/book2"),
+                Mocks.createCategoryFile(rootEntryId = "id1", id = "id3", title = "book3", path = "/root/books/book3")
         )
     }
 
@@ -118,8 +128,8 @@ class FileIndexerInitCategoriesTest {
 
         // Assert
         assertThat(result).containsExactly(
-            Category(rootEntryId = "r_id1", id = "id1", title = "book1", path = "/root/books1/book1"),
-            Category(rootEntryId = "r_id2", id = "id2", title = "book1", path = "/root/books2/book1")
+            Mocks.createCategoryFile(rootEntryId = "r_id1", id = "id1", title = "book1", path = "/root/books1/book1"),
+            Mocks.createCategoryFile(rootEntryId = "r_id2", id = "id2", title = "book1", path = "/root/books2/book1")
         )
     }
 }

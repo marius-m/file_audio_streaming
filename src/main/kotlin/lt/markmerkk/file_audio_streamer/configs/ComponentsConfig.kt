@@ -1,17 +1,20 @@
 package lt.markmerkk.file_audio_streamer.configs
 
 import io.sentry.Sentry
+import io.sentry.Sentry.OptionsConfiguration
 import io.sentry.SentryClient
+import io.sentry.SentryOptions
+import lt.markmerkk.TimeProvider
+import lt.markmerkk.TimeProviderImpl
 import lt.markmerkk.file_audio_streamer.BuildConfig
+import lt.markmerkk.file_audio_streamer.FileInfoProvider
+import lt.markmerkk.file_audio_streamer.FileInfoProviderImpl
 import lt.markmerkk.file_audio_streamer.UUIDGen
 import lt.markmerkk.file_audio_streamer.daos.BookDao
 import lt.markmerkk.file_audio_streamer.daos.CategoryDao
 import lt.markmerkk.file_audio_streamer.daos.RootEntryDao
 import lt.markmerkk.file_audio_streamer.daos.TrackDao
-import lt.markmerkk.file_audio_streamer.fs.BookRepository
-import lt.markmerkk.file_audio_streamer.fs.FSInteractor
-import lt.markmerkk.file_audio_streamer.fs.FSSource
-import lt.markmerkk.file_audio_streamer.fs.FileIndexer
+import lt.markmerkk.file_audio_streamer.fs.*
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -73,6 +76,32 @@ class ComponentsConfig {
 
     @Bean
     @Scope("singleton")
+    open fun timeProvider(
+        bookDao: BookDao,
+    ): TimeProvider {
+        return TimeProviderImpl()
+    }
+
+    @Bean
+    @Scope("singleton")
+    open fun fileInfoProvider(): FileInfoProvider {
+        return FileInfoProviderImpl()
+    }
+
+    @Bean
+    @Scope("singleton")
+    open fun categoryCustomRepository(
+        timeProvider: TimeProvider,
+        bookDao: BookDao,
+    ): CategoryCustomRepository {
+        return CategoryCustomRepository(
+            timeProvider,
+            bookDao,
+        )
+    }
+
+    @Bean
+    @Scope("singleton")
     open fun bookRepository(
         fsInteractor: FSInteractor,
         fsSource: FSSource,
@@ -80,7 +109,8 @@ class ComponentsConfig {
         rootEntryDao: RootEntryDao,
         categoryDao: CategoryDao,
         bookDao: BookDao,
-        trackDao: TrackDao
+        trackDao: TrackDao,
+        categoryCustomRepository: CategoryCustomRepository,
     ): BookRepository {
         return BookRepository(
             fsInteractor,
@@ -89,7 +119,8 @@ class ComponentsConfig {
             rootEntryDao,
             categoryDao,
             bookDao,
-            trackDao
+            trackDao,
+            categoryCustomRepository,
         )
     }
 
@@ -102,7 +133,9 @@ class ComponentsConfig {
         rootEntryDao: RootEntryDao,
         categoryDao: CategoryDao,
         bookDao: BookDao,
-        trackDao: TrackDao
+        trackDao: TrackDao,
+        timeProvider: TimeProvider,
+        fileInfoProvider: FileInfoProvider,
     ): FileIndexer {
         return FileIndexer(
             fsInteractor,
@@ -111,21 +144,23 @@ class ComponentsConfig {
             rootEntryDao,
             categoryDao,
             bookDao,
-            trackDao
+            trackDao,
+            timeProvider,
+            fileInfoProvider,
         ).apply { renewIndex() }
     }
 
     @Bean
     @Profile("prod")
     @Scope("singleton")
-    open fun sentryClientProd(): SentryClient {
+    open fun sentryClientProd(): Unit {
         return Sentry.init("https://948d91b168824f27a0490a1484b692c3@o348125.ingest.sentry.io/5289085")
     }
 
     @Bean
     @Profile("dev")
     @Scope("singleton")
-    open fun sentryClientDev(): SentryClient {
-        return Sentry.init()
+    open fun sentryClientDev(): Unit {
+        return Sentry.init { options -> options.isEnabled = false }
     }
 }

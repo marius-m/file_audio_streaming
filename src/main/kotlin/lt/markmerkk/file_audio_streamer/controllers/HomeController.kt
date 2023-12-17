@@ -21,6 +21,16 @@ class HomeController(
     @Autowired val fileIndexer: FileIndexer,
 ) {
 
+//    @RequestMapping(
+//        value = ["/customError"],
+//        method = [RequestMethod.GET]
+//    )
+//    fun renderError(
+//        model: Model
+//    ): String {
+//        error("Test error")
+//    }
+
     @RequestMapping(
             value = ["/categories"],
             method = [RequestMethod.GET]
@@ -32,7 +42,6 @@ class HomeController(
         model.addAttribute("navItems", navItems)
         val categories = bookRepository
                 .categories()
-                .sortedBy { it.title }
         model.addAttribute("categories", categories)
         model.addAttribute("indexStatus", fileIndexer.indexStatus())
         return "categories"
@@ -58,11 +67,11 @@ class HomeController(
         val books = if (keyword.isNullOrEmpty()) {
             bookRepository
                     .categoryBooks(categoryId)
-                    .sortedBy { it.title }
+                    .sortedByDescending { it.updatedAt }
         } else {
             bookRepository
                     .bookSearch(keyword, categoryId)
-                    .sortedBy { it.title }
+                    .sortedByDescending { it.updatedAt }
         }
         model.addAttribute("books", books)
         model.addAttribute("indexStatus", fileIndexer.indexStatus())
@@ -86,11 +95,11 @@ class HomeController(
         val books = if (keyword.isNullOrEmpty()) {
             bookRepository
                     .books()
-                    .sortedBy { it.title }
+                    .sortedByDescending { it.updatedAt }
         } else {
             bookRepository
                     .bookSearch(keyword)
-                    .sortedBy { it.title }
+                    .sortedByDescending { it.updatedAt }
         }
         model.addAttribute("navItems", navItems)
         model.addAttribute("books", books)

@@ -25,7 +25,7 @@ apply plugin: "org.jetbrains.kotlin.plugin.noarg"
 apply plugin: "kotlin-jpa"
 
 group = "lt.markmerkk"
-version = "1.5.0"
+version = "1.6.1"
 sourceCompatibility = 1.8
 compileKotlin {
 	kotlinOptions {
@@ -64,8 +64,8 @@ dependencies {
 
 	// Monitoring
 	implementation("org.slf4j:slf4j-api:1.7.27")
-	implementation("io.sentry:sentry:1.7.27")
-	implementation("io.sentry:sentry-logback:1.7.27")
+	implementation("io.sentry:sentry-logback:6.33.0")
+	implementation("io.sentry:sentry-spring-boot-starter:6.33.0")
 	implementation("org.apache.commons:commons-lang3:3.7")
 
 	implementation "commons-codec:commons-codec:1.12"

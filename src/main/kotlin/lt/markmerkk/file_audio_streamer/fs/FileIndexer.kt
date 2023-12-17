@@ -4,6 +4,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
+import lt.markmerkk.TimeProvider
+import lt.markmerkk.file_audio_streamer.DateTimeUtils
+import lt.markmerkk.file_audio_streamer.FileInfoProvider
 import lt.markmerkk.file_audio_streamer.UUIDGen
 import lt.markmerkk.file_audio_streamer.daos.BookDao
 import lt.markmerkk.file_audio_streamer.daos.CategoryDao
@@ -11,16 +14,16 @@ import lt.markmerkk.file_audio_streamer.daos.RootEntryDao
 import lt.markmerkk.file_audio_streamer.daos.TrackDao
 import lt.markmerkk.file_audio_streamer.fs.entities.IndexStats
 import lt.markmerkk.file_audio_streamer.fs.entities.IndexStatus
-import lt.markmerkk.file_audio_streamer.models.Book
-import lt.markmerkk.file_audio_streamer.models.Category
-import lt.markmerkk.file_audio_streamer.models.RootEntry
-import lt.markmerkk.file_audio_streamer.models.Track
+import lt.markmerkk.file_audio_streamer.models.*
 import lt.markmerkk.file_audio_streamer.models.jpa.BookEntity
 import lt.markmerkk.file_audio_streamer.models.jpa.CategoryEntity
 import lt.markmerkk.file_audio_streamer.models.jpa.RootEntryEntity
 import lt.markmerkk.file_audio_streamer.models.jpa.TrackEntity
 import org.apache.commons.lang3.time.StopWatch
 import org.slf4j.LoggerFactory
+import java.nio.file.Files
+import java.nio.file.Paths
+import java.nio.file.attribute.BasicFileAttributes
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.annotation.PreDestroy
 
@@ -34,7 +37,9 @@ class FileIndexer(
     private val rootEntryDao: RootEntryDao,
     private val categoryDao: CategoryDao,
     private val bookDao: BookDao,
-    private val trackDao: TrackDao
+    private val trackDao: TrackDao,
+    private val timeProvider: TimeProvider,
+    private val fileInfoProvider: FileInfoProvider,
 ) {
 
     private var sw = StopWatch()
@@ -169,7 +174,7 @@ class FileIndexer(
 
     internal fun initCategories(
         rootEntries: List<RootEntry>,
-    ): List<Category> {
+    ): List<CategoryFile> {
         if (rootEntries.isEmpty()) {
             return emptyList()
         }
@@ -182,12 +187,15 @@ class FileIndexer(
             .flatMap { (rootEntry, categoryDirs) ->
                 val categories = categoryDirs.map { categoryDir ->
                     val categoryDirPath = categoryDir.absolutePath
+                    val attr = fileInfoProvider.readBasicAttributes(categoryDir)
                     val catName = BookRepository.extractNameFromPath(categoryDirPath)
-                    val cat = Category(
+                    val cat = CategoryFile(
                         rootEntryId = rootEntry.id,
-                        id = uuidGen.genFrom(categoryDirPath),
-                        title = catName,
-                        path = categoryDirPath
+                        _id = uuidGen.genFrom(categoryDirPath),
+                        _title = catName,
+                        path = categoryDirPath,
+                        createdAt = timeProvider.fromInstant(attr.creationTime().toInstant()),
+                        updatedAt = timeProvider.fromInstant(attr.lastModifiedTime().toInstant()),
                     )
                     l.info("Found category $cat")
                     cat
@@ -196,18 +204,25 @@ class FileIndexer(
             }
     }
 
-    internal fun initBooksForCategory(category: Category): List<Book> {
+    internal fun initBooksForCategory(category: CategoryFile): List<Book> {
         l.info("Scanning books for Category(${category.title} / ${category.path})")
-        val books = fsInteractor.dirsInPath(category.path)
-            .filter { it.isDirectory }
+        val dirsInPath = fsInteractor.dirsInPath(category.path)
+        val dirsInPathAsString = dirsInPath
             .map { it.absolutePath }
-            .map { pathToBook ->
+        l.debug("Found raw books: ${dirsInPathAsString}")
+        val books = dirsInPath
+            .filter { it.isDirectory }
+            .map { bookDirectory ->
+                val attr = fileInfoProvider.readBasicAttributes(bookDirectory)
+                val pathToBook = bookDirectory.absolutePath
                 val bookName = BookRepository.extractNameFromPath(pathToBook)
                 val book = Book(
                     categoryId = category.id,
                     id = uuidGen.genFrom(pathToBook),
                     title = bookName,
-                    path = pathToBook
+                    path = pathToBook,
+                    createdAt = timeProvider.fromInstant(attr.creationTime().toInstant()),
+                    updatedAt = timeProvider.fromInstant(attr.lastModifiedTime().toInstant()),
                 )
                 l.info("Found Book(${book.id} / ${book.title} / ${book.path})")
                 book
@@ -216,7 +231,10 @@ class FileIndexer(
     }
 
     internal fun initTracksForBook(book: Book): List<Track> {
-        val tracks = fsInteractor.filesInPath(book.path)
+        val filesInPath = fsInteractor.filesInPath(book.path)
+        val filesInPathAsString = filesInPath.map { it.absolutePath }
+        l.debug("Found raw tracks (${filesInPath.size}) for Book(${book.id} / ${book.title} / ${book.path}): ${filesInPathAsString}")
+        val tracks = filesInPath
             .map { trackAsFile ->
                 Track(
                     bookId = book.id,

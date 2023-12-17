@@ -4,6 +4,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
+import lt.markmerkk.file_audio_streamer.DateTimeUtils
 import lt.markmerkk.file_audio_streamer.UUIDGen
 import lt.markmerkk.file_audio_streamer.daos.BookDao
 import lt.markmerkk.file_audio_streamer.daos.CategoryDao
@@ -21,6 +22,9 @@ import lt.markmerkk.file_audio_streamer.models.jpa.RootEntryEntity
 import lt.markmerkk.file_audio_streamer.models.jpa.TrackEntity
 import org.apache.commons.lang3.time.StopWatch
 import org.slf4j.LoggerFactory
+import java.nio.file.Files
+import java.nio.file.Paths
+import java.nio.file.attribute.BasicFileAttributes
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.annotation.PreDestroy
 
@@ -204,14 +208,19 @@ class FileIndexer(
         l.debug("Found raw books: ${dirsInPathAsString}")
         val books = dirsInPath
             .filter { it.isDirectory }
-            .map { it.absolutePath }
-            .map { pathToBook ->
+            .map { bookDirectory ->
+                val path = Paths.get(bookDirectory.absolutePath)
+                val attr: BasicFileAttributes = Files
+                    .readAttributes(path, BasicFileAttributes::class.java)
+                val pathToBook = bookDirectory.absolutePath
                 val bookName = BookRepository.extractNameFromPath(pathToBook)
                 val book = Book(
                     categoryId = category.id,
                     id = uuidGen.genFrom(pathToBook),
                     title = bookName,
-                    path = pathToBook
+                    path = pathToBook,
+                    createdAt = DateTimeUtils.fromInstant(attr.creationTime().toInstant()),
+                    updatedAt = DateTimeUtils.fromInstant(attr.lastModifiedTime().toInstant()),
                 )
                 l.info("Found Book(${book.id} / ${book.title} / ${book.path})")
                 book

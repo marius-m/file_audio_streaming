@@ -1,7 +1,6 @@
 package lt.markmerkk.file_audio_streamer.controllers
 
 import lt.markmerkk.file_audio_streamer.BuildConfig
-import lt.markmerkk.file_audio_streamer.DateTimeUtils
 import lt.markmerkk.file_audio_streamer.fs.BookRepository
 import lt.markmerkk.file_audio_streamer.fs.FileIndexer
 import lt.markmerkk.file_audio_streamer.models.form.FormEntitySearch
@@ -43,7 +42,6 @@ class HomeController(
         model.addAttribute("navItems", navItems)
         val categories = bookRepository
                 .categories()
-                .sortedByDescending { it.updatedAt }
         model.addAttribute("categories", categories)
         model.addAttribute("indexStatus", fileIndexer.indexStatus())
         return "categories"
@@ -107,30 +105,6 @@ class HomeController(
         model.addAttribute("books", books)
         model.addAttribute("indexStatus", fileIndexer.indexStatus())
         return "books"
-    }
-
-    @RequestMapping(
-        value = ["/books/year"],
-        method = [RequestMethod.GET]
-    )
-    fun renderBooksYearOld(
-        model: Model,
-    ): String {
-        val navItems = listOf(
-            NavItem.asRoot(bc),
-            NavItem.asCategories(bc),
-            NavItem.asBooks(bc)
-        )
-        val now = DateTimeUtils.now()
-        val yearFromNow = now.minusYears(1)
-        val books = bookRepository
-            .booksOlderThan(instance = yearFromNow)
-            .sortedByDescending { it.updatedAt }
-        model.addAttribute("metaYearFrom", DateTimeUtils.formatToStringAsBasic(yearFromNow))
-        model.addAttribute("navItems", navItems)
-        model.addAttribute("books", books)
-        model.addAttribute("indexStatus", fileIndexer.indexStatus())
-        return "books-year"
     }
 
     @RequestMapping(

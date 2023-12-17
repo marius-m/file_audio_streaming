@@ -1,7 +1,6 @@
 package lt.markmerkk.file_audio_streamer.models.jpa
 
-import lt.markmerkk.file_audio_streamer.DateTimeUtils
-import lt.markmerkk.file_audio_streamer.models.Category
+import lt.markmerkk.file_audio_streamer.models.CategoryFile
 import java.time.OffsetDateTime
 import javax.persistence.*
 
@@ -17,17 +16,17 @@ class CategoryEntity(
     @Column val updatedAt: OffsetDateTime,
 ) {
 
-    fun toCategory(): Category = Category(
+    fun toCategory(): CategoryFile = CategoryFile(
         rootEntryId = rootEntryId,
-        id = localId,
-        title = title,
+        _id = localId,
+        _title = title,
         path = path,
         createdAt = createdAt,
         updatedAt = updatedAt,
     )
 
     companion object {
-        fun from(category: Category): CategoryEntity {
+        fun from(category: CategoryFile): CategoryEntity {
             return CategoryEntity(
                 rootEntryId = category.rootEntryId,
                 localId = category.id,

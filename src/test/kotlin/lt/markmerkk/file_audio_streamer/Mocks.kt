@@ -3,10 +3,9 @@ package lt.markmerkk.file_audio_streamer
 import com.nhaarman.mockito_kotlin.doReturn
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.whenever
-import lt.markmerkk.file_audio_streamer.models.Book
-import lt.markmerkk.file_audio_streamer.models.Category
-import lt.markmerkk.file_audio_streamer.models.RootEntry
-import lt.markmerkk.file_audio_streamer.models.Track
+import lt.markmerkk.TimeProvider
+import lt.markmerkk.TimeProviderTest
+import lt.markmerkk.file_audio_streamer.models.*
 import java.io.File
 
 object Mocks {
@@ -19,16 +18,19 @@ object Mocks {
         path = path,
     )
 
-    fun createCategory(
+    fun createCategoryFile(
+        timeProvider: TimeProvider = TimeProviderTest,
         rootEntryId: String = "rootEntryId1",
         id: String = "id1",
         title: String = "books",
         path: String = "/root/books"
-    ): Category = Category(
+    ): CategoryFile = CategoryFile(
         rootEntryId = rootEntryId,
-        id = id,
-        title = title,
-        path = path
+        _id = id,
+        _title = title,
+        path = path,
+        createdAt = timeProvider.now(),
+        updatedAt = timeProvider.now(),
     )
 
     fun createTrack2(
@@ -44,6 +46,7 @@ object Mocks {
     )
 
     fun createBook(
+        timeProvider: TimeProvider = TimeProviderTest,
         categoryId: String = "c_id1",
         id: String = "b_id1",
         title: String = "books",
@@ -52,7 +55,9 @@ object Mocks {
         categoryId = categoryId,
         id = id,
         title = title,
-        path = path
+        path = path,
+        createdAt = timeProvider.now(),
+        updatedAt = timeProvider.now(),
     )
 
     //region Mocks

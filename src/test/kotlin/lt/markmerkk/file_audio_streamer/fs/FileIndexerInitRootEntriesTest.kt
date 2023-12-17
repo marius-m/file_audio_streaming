@@ -3,6 +3,8 @@ package lt.markmerkk.file_audio_streamer.fs
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.doReturn
 import com.nhaarman.mockito_kotlin.whenever
+import lt.markmerkk.FileInfoProviderTest
+import lt.markmerkk.TimeProviderTest
 import lt.markmerkk.file_audio_streamer.Mocks
 import lt.markmerkk.file_audio_streamer.UUIDGen
 import lt.markmerkk.file_audio_streamer.daos.BookDao
@@ -38,7 +40,9 @@ class FileIndexerInitRootEntriesTest {
             rootEntryDao = rootEntryDao,
             categoryDao = categoryDao,
             bookDao = booksDao,
-            trackDao = tracksDao
+            trackDao = tracksDao,
+            timeProvider = TimeProviderTest,
+            fileInfoProvider = FileInfoProviderTest,
         )
     }
 

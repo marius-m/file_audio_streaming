@@ -186,12 +186,17 @@ class FileIndexer(
             .flatMap { (rootEntry, categoryDirs) ->
                 val categories = categoryDirs.map { categoryDir ->
                     val categoryDirPath = categoryDir.absolutePath
+                    val path = Paths.get(categoryDir.absolutePath)
+                    val attr: BasicFileAttributes = Files
+                        .readAttributes(path, BasicFileAttributes::class.java)
                     val catName = BookRepository.extractNameFromPath(categoryDirPath)
                     val cat = Category(
                         rootEntryId = rootEntry.id,
                         id = uuidGen.genFrom(categoryDirPath),
                         title = catName,
-                        path = categoryDirPath
+                        path = categoryDirPath,
+                        createdAt = DateTimeUtils.fromInstant(attr.creationTime().toInstant()),
+                        updatedAt = DateTimeUtils.fromInstant(attr.lastModifiedTime().toInstant()),
                     )
                     l.info("Found category $cat")
                     cat

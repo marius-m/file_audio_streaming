@@ -16,6 +16,8 @@
             <tr>
                 <th scope="col">#</th>
                 <th scope="col">Title</th>
+                <th scope="col">Created at</th>
+                <th scope="col">Updated at</th>
             </tr>
             </thead>
             <tbody>
@@ -27,6 +29,8 @@
                             <span th:text="${category.title}"></span>
                         </a>
                     </td>
+                    <td><span th:text="${category.createdAtBasicAsString}"></span></td>
+                    <td><span th:text="${category.updatedAtBasicAsString}"></span></td>
                 </tr>
             </th:block>
             </tbody>

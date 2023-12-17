@@ -22,6 +22,8 @@
             <tr>
                 <th scope="col">#</th>
                 <th scope="col">Title</th>
+                <th scope="col">Created at</th>
+                <th scope="col">Updated at</th>
             </tr>
             </thead>
             <tbody>
@@ -33,6 +35,8 @@
                             <span th:text="${book.title}"></span>
                         </a>
                     </td>
+                    <td><span th:text="${book.createdAtBasicAsString}"></span></td>
+                    <td><span th:text="${book.updatedAtBasicAsString}"></span></td>
                 </tr>
             </th:block>
             </tbody>

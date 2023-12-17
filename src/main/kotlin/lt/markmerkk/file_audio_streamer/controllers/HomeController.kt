@@ -42,7 +42,7 @@ class HomeController(
         model.addAttribute("navItems", navItems)
         val categories = bookRepository
                 .categories()
-                .sortedBy { it.updatedAt }
+                .sortedByDescending { it.updatedAt }
         model.addAttribute("categories", categories)
         model.addAttribute("indexStatus", fileIndexer.indexStatus())
         return "categories"
@@ -68,11 +68,11 @@ class HomeController(
         val books = if (keyword.isNullOrEmpty()) {
             bookRepository
                     .categoryBooks(categoryId)
-                    .sortedBy { it.updatedAt }
+                    .sortedByDescending { it.updatedAt }
         } else {
             bookRepository
                     .bookSearch(keyword, categoryId)
-                    .sortedBy { it.updatedAt }
+                    .sortedByDescending { it.updatedAt }
         }
         model.addAttribute("books", books)
         model.addAttribute("indexStatus", fileIndexer.indexStatus())
@@ -96,11 +96,11 @@ class HomeController(
         val books = if (keyword.isNullOrEmpty()) {
             bookRepository
                     .books()
-                    .sortedBy { it.updatedAt }
+                    .sortedByDescending { it.updatedAt }
         } else {
             bookRepository
                     .bookSearch(keyword)
-                    .sortedBy { it.updatedAt }
+                    .sortedByDescending { it.updatedAt }
         }
         model.addAttribute("navItems", navItems)
         model.addAttribute("books", books)

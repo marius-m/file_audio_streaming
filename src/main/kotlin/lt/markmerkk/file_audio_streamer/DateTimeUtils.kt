@@ -16,6 +16,10 @@ object DateTimeUtils {
         return OffsetDateTime.ofInstant(date.toInstant(), ZoneOffset.UTC)
     }
 
+    fun now(): OffsetDateTime {
+        return OffsetDateTime.now(zoneId)
+    }
+
     fun fromInstant(instant: Instant): OffsetDateTime {
         return instant.atZone(zoneId).toOffsetDateTime()
     }

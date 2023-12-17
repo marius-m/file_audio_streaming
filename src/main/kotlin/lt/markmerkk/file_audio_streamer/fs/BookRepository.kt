@@ -1,5 +1,6 @@
 package lt.markmerkk.file_audio_streamer.fs
 
+import lt.markmerkk.file_audio_streamer.DateTimeUtils
 import lt.markmerkk.file_audio_streamer.UUIDGen
 import lt.markmerkk.file_audio_streamer.daos.BookDao
 import lt.markmerkk.file_audio_streamer.daos.CategoryDao
@@ -15,6 +16,7 @@ import lt.markmerkk.file_audio_streamer.models.jpa.RootEntryEntity
 import lt.markmerkk.file_audio_streamer.models.jpa.TrackEntity
 import org.apache.commons.lang3.time.StopWatch
 import org.slf4j.LoggerFactory
+import java.time.OffsetDateTime
 
 class BookRepository(
         private val fsInteractor: FSInteractor,
@@ -48,6 +50,17 @@ class BookRepository(
     fun books(): List<Book> {
         return bookDao.findAll()
                 .map { it.toBook() }
+    }
+
+    fun booksOlderThan(instance: OffsetDateTime): List<Book> {
+        return bookDao.findYearOldBooks(instance)
+            .map { it.toBook() }
+    }
+
+    fun booksOlderThanYear(): List<Book> {
+        val now = DateTimeUtils.now()
+        val yearFromNow = now.minusYears(1)
+        return booksOlderThan(instance = yearFromNow)
     }
 
     fun bookSearch(keyword: String): List<Book> {

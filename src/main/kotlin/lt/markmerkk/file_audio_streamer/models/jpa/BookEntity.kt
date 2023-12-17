@@ -1,6 +1,5 @@
 package lt.markmerkk.file_audio_streamer.models.jpa
 
-import lt.markmerkk.file_audio_streamer.DateTimeUtils
 import lt.markmerkk.file_audio_streamer.models.Book
 import java.time.OffsetDateTime
 import javax.persistence.*
@@ -13,8 +12,8 @@ class BookEntity(
     @Column val title: String,
     @Column val titleEng: String,
     @Column val path: String,
-    @Column val createdAt: String,
-    @Column val updatedAt: String,
+    @Column val createdAt: OffsetDateTime,
+    @Column val updatedAt: OffsetDateTime,
 ) {
 
     fun toBook(): Book = Book(
@@ -22,8 +21,8 @@ class BookEntity(
         id = localId,
         title = title,
         path = path,
-        createdAt = DateTimeUtils.parseFromString(createdAt),
-        updatedAt = DateTimeUtils.parseFromString(updatedAt),
+        createdAt = createdAt,
+        updatedAt = updatedAt,
     )
 
     companion object {
@@ -34,8 +33,8 @@ class BookEntity(
                 title = book.title,
                 titleEng = book.titleEng,
                 path = book.path,
-                createdAt = DateTimeUtils.formatToString(book.createdAt),
-                updatedAt = DateTimeUtils.formatToString(book.updatedAt),
+                createdAt = book.createdAt,
+                updatedAt = book.updatedAt,
             )
         }
     }

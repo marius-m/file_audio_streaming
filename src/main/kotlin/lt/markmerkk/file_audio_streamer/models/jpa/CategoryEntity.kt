@@ -2,6 +2,7 @@ package lt.markmerkk.file_audio_streamer.models.jpa
 
 import lt.markmerkk.file_audio_streamer.DateTimeUtils
 import lt.markmerkk.file_audio_streamer.models.Category
+import java.time.OffsetDateTime
 import javax.persistence.*
 
 @Entity(name = "category")
@@ -12,8 +13,8 @@ class CategoryEntity(
     @Column val title: String,
     @Column val titleEng: String,
     @Column val path: String,
-    @Column val createdAt: String,
-    @Column val updatedAt: String,
+    @Column val createdAt: OffsetDateTime,
+    @Column val updatedAt: OffsetDateTime,
 ) {
 
     fun toCategory(): Category = Category(
@@ -21,8 +22,8 @@ class CategoryEntity(
         id = localId,
         title = title,
         path = path,
-        createdAt = DateTimeUtils.parseFromString(createdAt),
-        updatedAt = DateTimeUtils.parseFromString(updatedAt),
+        createdAt = createdAt,
+        updatedAt = updatedAt,
     )
 
     companion object {
@@ -33,8 +34,8 @@ class CategoryEntity(
                 title = category.title,
                 titleEng = category.titleEng,
                 path = category.path,
-                createdAt = DateTimeUtils.formatToString(category.createdAt),
-                updatedAt = DateTimeUtils.formatToString(category.updatedAt),
+                createdAt = category.createdAt,
+                updatedAt = category.updatedAt,
             )
         }
     }

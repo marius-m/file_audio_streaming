@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="fragments/frag_res :: css"/>
+</head>
+<body>
+<div class="container">
+    <h1>Books</h1>
+    <th:block th:replace="fragments/frag_nav :: breadcrumb"/>
+    <th:block th:if="${indexStatus.isRunning}">
+        <p th:text="${indexStatus.statusMessage}"></p>
+    </th:block>
+    <p>Younger than: <span th:text="${metaYearFrom}"></span></p>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Title</th>
+                <th scope="col">Created at</th>
+                <th scope="col">Updated at</th>
+            </tr>
+            </thead>
+            <tbody>
+            <th:block th:each="book : ${books}">
+                <tr>
+                    <th scope="row" th:text="${book.id}"></th>
+                    <td>
+                        <a th:href="@{/books/} + ${book.id}">
+                            <span th:text="${book.title}"></span>
+                        </a>
+                    </td>
+                    <td><span th:text="${book.createdAtBasicAsString}"></span></td>
+                    <td><span th:text="${book.updatedAtBasicAsString}"></span></td>
+                </tr>
+            </th:block>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<th:block th:replace="fragments/frag_res :: js"/>
+</body>
+</html>
